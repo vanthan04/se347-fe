@@ -1,0 +1,88 @@
+import { useEffect } from "react";
+import useSocketStore from "@/lib/stores/socketStore";
+import { useOrderStore } from "@/lib/stores/orderStore";
+import useUserStore from "@/lib/stores/userStore";
+import { toast } from "react-toastify";
+
+/**
+ * OrderListener - Lắng nghe các sự kiện liên quan đến Order/Task
+ * - task_created: Khi có đơn mới được tạo (cho Tasker)
+ * - task_updated: Khi trạng thái đơn thay đổi
+ * - task_accepted: Khi Tasker nhận đơn
+ * - task_completed: Khi đơn hoàn thành
+ * - task_cancelled: Khi đơn bị hủy
+ */
+const OrderListener = () => {
+  const socket = useSocketStore((state) => state.socket);
+  const user = useUserStore((state) => state.user);
+  const userId = useUserStore((state) => state.userId);
+
+  const { updateOrder, addAvailableOrder } = useOrderStore();
+
+  useEffect(() => {
+    if (!socket || !user) return;
+
+    // Handler: Khi có đơn mới được tạo (chỉ Tasker quan tâm)
+    const handleTaskCreated = (newOrder) => {
+      if (user.role === "tasker") {
+        // Thêm vào danh sách đơn có sẵn
+        addAvailableOrder(newOrder);
+
+        // Bắn sự kiện mở Modal
+        const event = new CustomEvent("OPEN_TASK_MODAL", { detail: newOrder });
+        window.dispatchEvent(event);
+
+        // Thông báo
+        toast.info("🔔 Có đơn hàng mới!");
+      }
+    };
+
+    // Handler: Khi trạng thái đơn thay đổi
+    const handleTaskUpdated = (updatedOrder) => {
+      // Cập nhật store
+      updateOrder(updatedOrder);
+
+      // Thông báo cho Customer
+      if (user.role === "customer" && updatedOrder.customerId === userId) {
+        if (updatedOrder.status === "accepted") {
+          toast.success("✅ Đã tìm thấy Tasker cho bạn!");
+        } else if (updatedOrder.status === "in_progress") {
+          toast.info("🚀 Tasker đang thực hiện công việc!");
+        } else if (updatedOrder.status === "completed") {
+          toast.success("🏁 Công việc đã hoàn thành!");
+        } else if (updatedOrder.status === "cancelled") {
+          toast.error("❌ Đơn hàng đã bị hủy");
+        }
+      }
+
+      // Thông báo cho Tasker
+      if (user.role === "tasker" && updatedOrder.taskerId === userId) {
+        if (updatedOrder.status === "cancelled") {
+          toast.error("❌ Khách hàng đã hủy đơn này");
+        } else if (updatedOrder.status === "completed") {
+          toast.success("🏁 Bạn đã hoàn thành công việc!");
+        }
+      }
+    };
+
+    // Đăng ký listeners
+    socket.on("task_created", handleTaskCreated);
+    socket.on("task_updated", handleTaskUpdated);
+    socket.on("task_accepted", handleTaskUpdated);
+    socket.on("task_completed", handleTaskUpdated);
+    socket.on("task_cancelled", handleTaskUpdated);
+
+    // Cleanup
+    return () => {
+      socket.off("task_created", handleTaskCreated);
+      socket.off("task_updated", handleTaskUpdated);
+      socket.off("task_accepted", handleTaskUpdated);
+      socket.off("task_completed", handleTaskUpdated);
+      socket.off("task_cancelled", handleTaskUpdated);
+    };
+  }, [socket, user, userId, updateOrder, addAvailableOrder]);
+
+  return null;
+};
+
+export default OrderListener;

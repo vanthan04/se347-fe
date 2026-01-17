@@ -1,0 +1,230 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap');
+
+@import "tailwindcss";
+
+@theme {
+  --font-montserrat: "Montserrat", sans-serif;
+  
+  /* Primary colors */
+  --color-primary-100: #EAFED9;
+  --color-primary-200: #95DA97;
+  --color-primary-400: #5C956C;
+  --color-primary-500: #3B5F43;
+  
+  /* Primary Tasker colors */
+  --color-primaryTasker-100: #E0E7FF;
+  --color-primaryTasker-200: #A5B4FC;
+  --color-primaryTasker-400: #4F46E5;
+  --color-primaryTasker-500: #3730A3;
+  
+  /* Secondary colors */
+  --color-secondary-100: #12A327;
+  --color-secondary-150: #108121ff;
+  --color-secondary-200: #54A312;
+  
+  /* Accent colors */
+  --color-accent-500: #FFBE18;
+  --color-accent-550: #e0a714ff;
+  
+  /* Danger colors */
+  --color-danger-600: #dc2626;
+  --color-danger-650: #bd1d1dff;
+  
+  /* Gray colors */
+  --color-gray-50: #F7F7F7;
+  --color-gray-100: #E7E7E7;
+  --color-gray-200: #D1D5DB;
+  --color-gray-300: #9CA3AF;
+  --color-gray-400: #969496;
+  --color-gray-600: #4B5563;
+  --color-gray-700: #374151;
+  --color-gray-800: #1F2937;
+  --color-gray-900: #111827;
+  
+  /* Dark colors */
+  --color-dark-900: #282A37;
+  
+  /* Basic colors */
+  --color-white: #FFFFFF;
+  --color-black: #000000;
+}
+
+/* Custom styles */
+@layer base {
+  html,
+  body {
+    @apply font-montserrat;
+    margin: 0;
+    min-width: 320px;
+    min-height: 100vh;
+  }
+
+  h1 {
+    @apply font-bold text-2xl;
+  }
+
+  h2 {
+    @apply font-bold text-xl;
+  }
+
+  .divider {
+    @apply border-b;
+  }
+}
+
+@layer components {
+  .admin-shell {
+    @apply min-h-screen bg-gray-200 text-gray-800;
+  }
+
+  .admin-layout {
+    @apply flex min-h-screen;
+  }
+
+  .sidebar {
+    @apply w-64 bg-gray-800 text-white flex flex-col;
+  }
+
+  .sidebar-brand {
+    @apply h-14 px-5 flex items-center gap-3 border-b border-white/10;
+  }
+
+  .sidebar-brand-title {
+    @apply font-semibold text-sm tracking-wide;
+  }
+
+  .sidebar-nav {
+    @apply p-3 flex-1;
+  }
+
+  .sidebar-link {
+    @apply w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm text-white/85 hover:text-white hover:bg-white/10 transition;
+  }
+
+  .sidebar-link.active {
+    @apply bg-white/15 text-white;
+  }
+
+  .sidebar-footer {
+    @apply p-3 border-t border-white/10;
+  }
+
+  .main-area {
+    @apply flex-1 min-w-0;
+  }
+
+  .topbar {
+    @apply h-14 bg-gray-700 text-white flex items-center justify-between px-4;
+  }
+
+  .topbar-left {
+    @apply flex items-center gap-3 min-w-0;
+  }
+
+  .topbar-title {
+    @apply font-semibold truncate;
+  }
+
+  .topbar-btn {
+    @apply inline-flex items-center gap-2 px-3 py-2 rounded-md bg-white/10 hover:bg-white/15 transition text-sm;
+  }
+
+  .content-wrap {
+    @apply p-5;
+  }
+
+  .content-card {
+    @apply bg-white rounded-xl shadow-sm border border-gray-100 p-5 min-h-[520px];
+  }
+
+  .page-title {
+    @apply text-base font-semibold text-gray-800;
+  }
+
+  .muted {
+    @apply text-sm text-gray-600;
+  }
+
+  .add-btn {
+    @apply bg-secondary-100 hover:bg-secondary-150 text-white px-5 py-2.5 rounded-lg font-semibold transition-all;
+  }
+
+  header {
+    @apply sticky top-0 left-0 right-0 h-16 border-b flex items-center justify-between px-4 z-[70];
+  }
+
+  .menu-hamburger {
+    @apply fixed top-16 left-0 right-0 h-auto bg-white z-[60] 
+    transform -translate-y-[120%] transition-transform duration-500 ease-in-out overflow-y-auto 
+    rounded-b-2xl border-b;
+  }
+
+  .card-container {
+    @apply bg-white rounded-xl shadow-md;
+  }
+
+  .dropdown-items {
+    @apply max-h-0 overflow-hidden transition-all duration-300 ease-in-out;
+  }
+
+  .logo-icon {
+    @apply w-10 h-10 rounded-full bg-white flex items-center justify-center;
+  }
+}
+
+@layer utilities {
+  .sidebar-mobile {
+    @apply fixed inset-y-0 left-0 z-50 w-64 transform bg-gray-800 text-white transition-transform duration-200;
+  }
+
+  .sidebar-mobile.closed {
+    @apply -translate-x-full;
+  }
+
+  .backdrop {
+    @apply fixed inset-0 z-40 bg-black/40 hidden;
+  }
+
+  .backdrop.show {
+    @apply block;
+  }
+
+  .text-hover-tasker-400 {
+    @apply hover:text-primaryTasker-400;
+  }
+
+  .border-hover-tasker-400 {
+    @apply hover:border-primaryTasker-400;
+  }
+
+  .group-hover-tasker-400 {
+    @apply group-hover:text-primaryTasker-400 group-hover:border-primaryTasker-400;
+  }
+}
+
+.hour-btn {
+  @apply w-full py-3 rounded-xl border border-gray-300 bg-white text-base text-black shadow-sm;
+}
+
+.hour-btn-hover {
+  @apply hover:border-primary-500 hover:text-primary-500 hover:font-bold;
+  transition: all 0.2s ease;
+}
+
+.action-btn {
+  @apply flex-1 py-3 rounded-xl bg-primary-400 text-white font-bold text-xl shadow-lg;
+}
+
+.action-btn-hover {
+  @apply hover:bg-primary-500 hover:shadow-xl;
+  transition: all 0.3s ease;
+}
+
+.quantity-action-btn {
+  @apply w-6 h-6 px-4 rounded-full text-gray-400 bg-white flex items-center justify-center border text-lg;
+}
+
+.quantity-action-btn-hover {
+  @apply hover:bg-gray-400 hover:text-white;
+  transition: all 0.3s ease;
+}

@@ -1,0 +1,9 @@
+export { default as Babysitting } from './Babysitting';
+export { default as CleaningAirConditioner } from './CleaningAirConditioner';
+export { default as CleaningHouse } from './CleaningHouse';
+export { default as CleaningWashingMachine } from './CleaningWashingMachine';
+export { default as Cooking } from './Cooking';
+export { default as Laundry } from './Laundry';
+export { default as Market } from './Market';
+export { default as TakeCareOfElder } from './TakeCareOfElder';
+export { default as TakeCareOfSickPeople } from './TakeCareOfSickPeople';
