@@ -2,10 +2,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import useUserStore from "@/lib/stores/userStore";
-import { APP_PATHS } from "@/lib/contants";
-import AppHeader from "@/components/layout/AppHeader";
-import AppFooter from "@/components/layout/AppFooter";
+import { customerOrderService } from "@/lib/services/customerService";
 
 const CustomerActivity = () => {
   const [activeTab, setActiveTab] = useState("upcoming");
@@ -15,7 +12,6 @@ const CustomerActivity = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const { token } = useUserStore();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -25,16 +21,11 @@ const CustomerActivity = () => {
   const loadOrders = async () => {
     setLoading(true);
     try {
-      const endpoint =
+      const data =
         activeTab === "upcoming"
-          ? "http://localhost:3000/api/customer/orders/upcoming"
-          : "http://localhost:3000/api/customer/orders/history";
+          ? await customerOrderService.getUpcomingOrders()
+          : await customerOrderService.getOrderHistory();
 
-      const res = await fetch(endpoint, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      const data = await res.json();
       if (data.success) {
         if (activeTab === "upcoming") {
           setUpcomingOrders(data.orders || []);
@@ -53,15 +44,7 @@ const CustomerActivity = () => {
     if (!confirm("Bạn có chắc muốn hủy đơn hàng này?")) return;
 
     try {
-      const res = await fetch(
-        `http://localhost:3000/api/customer/orders/${orderId}/cancel`,
-        {
-          method: "PATCH",
-          headers: { Authorization: `Bearer ${token}` },
-        },
-      );
-
-      const data = await res.json();
+      const data = await customerOrderService.cancelOrder(orderId);
       if (data.success) {
         toast.success("Hủy đơn hàng thành công!");
         loadOrders();
@@ -93,81 +76,71 @@ const CustomerActivity = () => {
         );
 
   return (
-    <div className="min-h-screen bg-primary-100 flex flex-col">
-      <AppHeader
-        title="Hoạt động"
-        showBack={true}
-        onBackClick={() => navigate(APP_PATHS.CUSTOMER.HOME)}
-      />
+    <div className="space-y-4">
+      {/* Search */}
+      <div className="mb-4">
+        <input
+          type="text"
+          placeholder="Tìm kiếm đơn hàng..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="w-full bg-white shadow-md px-4 py-3 rounded-full border focus:outline-none focus:border-primary-500"
+        />
+      </div>
 
-      <main className="flex-1 p-4 pb-24">
-        {/* Search */}
-        <div className="mb-4">
-          <input
-            type="text"
-            placeholder="Tìm kiếm đơn hàng..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full bg-white shadow-md px-4 py-3 rounded-full border focus:outline-none focus:border-primary-500"
-          />
+      {/* Tabs */}
+      <div className="flex gap-2 mb-4">
+        <button
+          onClick={() => setActiveTab("upcoming")}
+          className={`flex-1 py-2 px-4 rounded-full font-semibold transition ${
+            activeTab === "upcoming"
+              ? "bg-primary-500 text-white shadow-md"
+              : "bg-white text-gray-600"
+          }`}
+        >
+          Sắp tới
+        </button>
+        <button
+          onClick={() => setActiveTab("history")}
+          className={`flex-1 py-2 px-4 rounded-full font-semibold transition ${
+            activeTab === "history"
+              ? "bg-primary-500 text-white shadow-md"
+              : "bg-white text-gray-600"
+          }`}
+        >
+          Lịch sử
+        </button>
+      </div>
+
+      {/* Orders List */}
+      {loading ? (
+        <div className="text-center py-8">
+          <span className="material-symbols-outlined text-4xl text-primary-500 animate-spin">
+            progress_activity
+          </span>
         </div>
-
-        {/* Tabs */}
-        <div className="flex gap-2 mb-4">
-          <button
-            onClick={() => setActiveTab("upcoming")}
-            className={`flex-1 py-2 px-4 rounded-full font-semibold transition ${
-              activeTab === "upcoming"
-                ? "bg-primary-500 text-white shadow-md"
-                : "bg-white text-gray-600"
-            }`}
-          >
-            Sắp tới
-          </button>
-          <button
-            onClick={() => setActiveTab("history")}
-            className={`flex-1 py-2 px-4 rounded-full font-semibold transition ${
-              activeTab === "history"
-                ? "bg-primary-500 text-white shadow-md"
-                : "bg-white text-gray-600"
-            }`}
-          >
-            Lịch sử
-          </button>
+      ) : filteredOrders.length === 0 ? (
+        <div className="text-center py-12">
+          <span className="material-symbols-outlined text-6xl text-gray-300 mb-2">
+            receipt_long
+          </span>
+          <p className="text-gray-500">
+            {activeTab === "upcoming"
+              ? "Chưa có đơn hàng sắp tới"
+              : "Chưa có lịch sử đơn hàng"}
+          </p>
         </div>
-
-        {/* Orders List */}
-        {loading ? (
-          <div className="text-center py-8">
-            <span className="material-symbols-outlined text-4xl text-primary-500 animate-spin">
-              progress_activity
-            </span>
-          </div>
-        ) : filteredOrders.length === 0 ? (
-          <div className="text-center py-12">
-            <span className="material-symbols-outlined text-6xl text-gray-300 mb-2">
-              receipt_long
-            </span>
-            <p className="text-gray-500">
-              {activeTab === "upcoming"
-                ? "Chưa có đơn hàng sắp tới"
-                : "Chưa có lịch sử đơn hàng"}
-            </p>
-          </div>
-        ) : (
-          <div className="space-y-3">
-            {filteredOrders.map((order) => (
-              <OrderCard
-                key={order._id}
-                order={order}
-                onViewDetail={handleViewDetail}
-              />
-            ))}
-          </div>
-        )}
-      </main>
-
-      <AppFooter />
+      ) : (
+        <div className="space-y-3">
+          {filteredOrders.map((order) => (
+            <OrderCard
+              key={order._id}
+              order={order}
+              onViewDetail={handleViewDetail}
+            />
+          ))}
+        </div>
+      )}
 
       {/* Order Detail Modal */}
       {selectedOrder && (

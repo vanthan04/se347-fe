@@ -4,7 +4,7 @@ import { APP_PATHS } from '@/lib/contants';
 import useUserStore from '@/lib/stores/userStore'; 
 
 const api = axios.create({
-  baseURL: CONFIG.API_BASE_URL,
+  baseURL: `${CONFIG.API_BASE_URL}/api`,
   headers: {
     'Content-Type': 'application/json'
   }

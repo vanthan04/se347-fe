@@ -42,6 +42,14 @@ const OrderListener = () => {
       // Cập nhật store
       updateOrder(updatedOrder);
 
+      // Dispatch event for customer components
+      if (updatedOrder.status === "accepted") {
+        const event = new CustomEvent("ORDER_ACCEPTED", {
+          detail: updatedOrder,
+        });
+        window.dispatchEvent(event);
+      }
+
       // Thông báo cho Customer
       if (user.role === "customer" && updatedOrder.customerId === userId) {
         if (updatedOrder.status === "accepted") {
@@ -65,8 +73,53 @@ const OrderListener = () => {
       }
     };
 
+    // Handler: BE suggest tasker cho order
+    const handleSuggestTasker = (data) => {
+      console.log("Suggest tasker:", data);
+      if (user.role === "tasker") {
+        const event = new CustomEvent("OPEN_TASK_MODAL", {
+          detail: {
+            _id: data.order_id,
+            ...data.suggestion,
+          },
+        });
+        window.dispatchEvent(event);
+        toast.info("🔔 Có đơn hàng mới dành cho bạn!");
+      }
+    };
+
+    // Handler: Tasker đã accept order
+    const handleOrderAccepted = (data) => {
+      console.log("Order accepted:", data);
+
+      const event = new CustomEvent("ORDER_ACCEPTED", { detail: data });
+      window.dispatchEvent(event);
+
+      if (user.role === "customer" && data.tasker_id) {
+        toast.success("✅ Đã tìm thấy Tasker cho bạn!");
+      }
+    };
+
+    // Handler: Tasker được assign
+    const handleTaskerAssigned = (data) => {
+      console.log("Tasker assigned:", data);
+      const event = new CustomEvent("TASKER_ASSIGNED", { detail: data });
+      window.dispatchEvent(event);
+    };
+
+    // Handler: Order đã được accept bởi người khác
+    const handleOrderAlreadyAccepted = () => {
+      if (user.role === "tasker") {
+        toast.error("Tiếc quá, có người nhanh tay hơn rồi!");
+      }
+    };
+
     // Đăng ký listeners
     socket.on("task_created", handleTaskCreated);
+    socket.on("suggest-tasker", handleSuggestTasker);
+    socket.on("order-accepted", handleOrderAccepted);
+    socket.on("tasker-assigned", handleTaskerAssigned);
+    socket.on("order-already-accepted", handleOrderAlreadyAccepted);
     socket.on("task_updated", handleTaskUpdated);
     socket.on("task_accepted", handleTaskUpdated);
     socket.on("task_completed", handleTaskUpdated);
@@ -75,6 +128,10 @@ const OrderListener = () => {
     // Cleanup
     return () => {
       socket.off("task_created", handleTaskCreated);
+      socket.off("suggest-tasker", handleSuggestTasker);
+      socket.off("order-accepted", handleOrderAccepted);
+      socket.off("tasker-assigned", handleTaskerAssigned);
+      socket.off("order-already-accepted", handleOrderAlreadyAccepted);
       socket.off("task_updated", handleTaskUpdated);
       socket.off("task_accepted", handleTaskUpdated);
       socket.off("task_completed", handleTaskUpdated);

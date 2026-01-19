@@ -1,11 +1,9 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
-import { APP_PATHS } from "@/lib/contants";
 import { chatService } from "@/lib/services/taskerService";
 import { toast } from "react-toastify";
 import useSocketStore from "@/lib/stores/socketStore";
-import useUserStore from "@/lib/stores/userStore";
 
 const TaskerChat = () => {
   const { orderId: paramOrderId } = useParams();
@@ -15,7 +13,6 @@ const TaskerChat = () => {
   // Get socket from global store
   const socket = useSocketStore((state) => state.socket);
   const isConnected = useSocketStore((state) => state.isConnected);
-  const token = useUserStore((state) => state.token);
 
   const [currentOrderId, setCurrentOrderId] = useState(
     paramOrderId || searchParams.get("orderId"),
@@ -256,20 +253,17 @@ const TaskerChat = () => {
     <div className="h-screen w-full overflow-hidden flex flex-col bg-[#F0FDF4]">
       {/* Header */}
       <nav className="sticky top-0 z-100 bg-white shadow-sm">
-        <header
-          style={{ backgroundColor: "#A5B4FC" }}
-          className="flex items-center justify-between px-4 py-3 shadow-md"
-        >
+        <header className="bg-primary-200 flex items-center justify-between px-4 py-3 shadow-md">
           <div className="flex items-center gap-3">
             <button
               onClick={() => navigate(`/tasker/order/${currentOrderId}`)}
-              className="shrink-0 w-9 h-9 bg-white rounded-full p-1 flex items-center justify-center shadow-sm hover:bg-gray-50 transition text-[#3730A3]"
+              className="shrink-0 w-9 h-9 bg-white rounded-full p-1 flex items-center justify-center shadow-sm hover:bg-gray-50 transition text-primary-700"
             >
               <span className="material-symbols-outlined text-[20px]">
                 arrow_back
               </span>
             </button>
-            <h1 className="text-[#111827] font-bold text-lg uppercase tracking-wide">
+            <h1 className="text-dark-900 font-bold text-lg uppercase tracking-wide">
               Tin nhắn
             </h1>
           </div>

@@ -1,17 +1,16 @@
 ﻿/* eslint-disable react-hooks/exhaustive-deps */
 import { useState, useEffect } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { APP_PATHS } from "@/lib/contants";
 import { taskService } from "@/lib/services/customerService";
 
 const TakeCareOfElder = () => {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
+  const { id: taskId } = useParams();
   const [selectedTime, setSelectedTime] = useState({ hours: 0, price: 0 });
   const [taskDetail, setTaskDetail] = useState(null);
-  const basePrice = Number(searchParams.get("price")) || 200000;
-  const taskId = searchParams.get("id");
+  const basePrice = taskDetail?.pricing || 200000;
 
   const timeOptions = [
     { hours: 2, price: 200000 },
@@ -73,46 +72,29 @@ const TakeCareOfElder = () => {
   };
 
   return (
-    <div className="bg-primary-100 min-h-screen font-montserrat">
-      <header className="bg-primary-200 py-4">
-        <div className="flex items-center justify-between px-4">
-          <div className="text-primary-500 w-10 h-10 rounded-full bg-white flex items-center justify-center opacity-70">
-            <img src="/images/taskgo-logo.png" alt="TaskGo" />
-          </div>
-          <h1 className="font-bold text-xl text-dark-900">Chi tiết dịch vụ</h1>
-          <div className="w-10 h-10 flex items-center justify-center">
-            <span className="material-symbols-outlined text-primary-500 text-4xl">
-              menu
-            </span>
-          </div>
-        </div>
-      </header>
+    <div className="bg-primary-100 min-h-screen pb-24">
+      {/* Banner */}
+      <div className="bg-gradient-to-r from-primary-500 to-primary-600 text-white p-6 shadow-lg">
+        <h1 className="text-2xl font-bold">Chăm sóc người cao tuổi</h1>
+        <p className="text-sm opacity-90 mt-1">
+          Dịch vụ chăm sóc chu đáo và tận tâm
+        </p>
+      </div>
 
-      <main className="p-4 space-y-4 pb-20">
+      <main className="p-4 space-y-4">
         <div className="bg-white rounded-xl shadow-md p-4 space-y-4">
-          <div className="flex items-center justify-between border-b pb-2">
-            <h2 className="text-2xl font-bold text-primary-500">
-              Chăm sóc người cao tuổi
-            </h2>
+          <div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded">
+            <p className="text-sm text-gray-700">
+              <span className="font-semibold">📋 Dịch vụ bao gồm:</span>
+            </p>
+            <ul className="list-disc pl-5 space-y-1 text-sm text-gray-700 mt-2">
+              <li>Trông nom, chăm sóc người cao tuổi</li>
+              <li>Cho người cao tuổi ăn uống</li>
+              <li>Vệ sinh răng miệng, hỗ trợ gội đầu, tắm rửa</li>
+              <li>Thay đổi tư thế, chuyển động cho người bệnh</li>
+              <li>Trò chuyện, đọc sách, xem TV cùng người cao tuổi</li>
+            </ul>
           </div>
-
-          <p className="text-base mb-4">
-            Đây là dịch vụ chăm sóc người cao tuổi với các tuỳ chọn theo buổi
-            hoặc theo ngày. Bao gồm các công việc:
-          </p>
-
-          <ul className="list-disc pl-5 space-y-2 text-sm text-dark-300 mb-6">
-            <li>Trông nom, chăm sóc người cao tuổi</li>
-            <li>Cho người cao tuổi ăn uống</li>
-            <li>Vệ sinh răng miệng, hỗ trợ gội đầu, tắm rửa</li>
-            <li>Nâng đỡ, hỗ trợ di chuyển</li>
-            <li>
-              Đổ bô, chất thải của người cao tuổi khi không tự đi vệ sinh được
-            </li>
-            <li>Vệ sinh các công cụ đựng chất thải của người cao tuổi</li>
-            <li>Theo dõi nhiệt độ, huyết áp, mạch</li>
-            <li>Xoa bóp vùng đau nhức, vỗ rung</li>
-          </ul>
 
           <h3 className="text-lg font-bold text-dark-900">
             Chọn thời gian chăm sóc
@@ -161,31 +143,6 @@ const TakeCareOfElder = () => {
           </div>
         </div>
       </main>
-
-      <footer>
-        <nav className="fixed bottom-0 left-0 right-0 bg-primary-200 border-t shadow-xl">
-          <div className="flex justify-around py-2 text-base">
-            <a href="#" className="flex flex-col items-center text-white">
-              <span className="material-symbols-outlined text-4xl">house</span>
-              Trang chủ
-            </a>
-            <a href="#" className="flex flex-col items-center text-primary-500">
-              <span className="material-symbols-outlined text-4xl">news</span>
-              Hoạt động
-            </a>
-            <a href="#" className="flex flex-col items-center text-primary-500">
-              <span className="material-symbols-outlined text-4xl">chat</span>
-              Tin nhắn
-            </a>
-            <a href="#" className="flex flex-col items-center text-primary-500">
-              <span className="material-symbols-outlined text-4xl">
-                lightbulb
-              </span>
-              Thông báo
-            </a>
-          </div>
-        </nav>
-      </footer>
     </div>
   );
 };

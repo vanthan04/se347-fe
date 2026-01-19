@@ -1,10 +1,9 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import useUserStore from "@/lib/stores/userStore";
+import { taskService } from "@/lib/services/customerService";
+import { cn } from "@/lib/utils/cn";
 import { APP_PATHS } from "@/lib/contants";
-import AppHeader from "@/components/layout/AppHeader";
-import AppFooter from "@/components/layout/AppFooter";
 
 const CustomerServiceList = () => {
   const [categories, setCategories] = useState([]);
@@ -14,18 +13,20 @@ const CustomerServiceList = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const { token } = useUserStore();
   const navigate = useNavigate();
 
   const TASK_DETAIL_MAP = {
-    cleaning_washing_machine: "/customer/service/cleaning-washing-machine",
-    cleaning_house: "/customer/service/cleaning-house",
-    cleaning_air_conditioner: "/customer/service/cleaning-air-conditioner",
-    caring_elderly: "/customer/service/caring-elderly",
-    caring_thesick: "/customer/service/caring-sick",
-    caring_children: "/customer/service/babysitting",
-    shopping: "/customer/service/shopping",
-    cooking: "/customer/service/cooking",
+    cleaning_washing_machine:
+      APP_PATHS.CUSTOMER.DETAILS.CLEANING_WASHING_MACHINE,
+    cleaning_house: APP_PATHS.CUSTOMER.DETAILS.CLEANING_HOUSE,
+    cleaning_air_conditioner:
+      APP_PATHS.CUSTOMER.DETAILS.CLEANING_AIR_CONDITIONER,
+    caring_elderly: APP_PATHS.CUSTOMER.DETAILS.TAKE_CARE_OF_ELDER,
+    caring_thesick: APP_PATHS.CUSTOMER.DETAILS.TAKE_CARE_OF_SICK_PEOPLE,
+    caring_children: APP_PATHS.CUSTOMER.DETAILS.BABYSITTING,
+    shopping: APP_PATHS.CUSTOMER.DETAILS.MARKET,
+    cooking: APP_PATHS.CUSTOMER.DETAILS.COOKING,
+    checking_equipments: APP_PATHS.CUSTOMER.DETAILS.CLEANING_AIR_CONDITIONER,
   };
 
   useEffect(() => {
@@ -39,13 +40,11 @@ const CustomerServiceList = () => {
 
   const loadCategories = async () => {
     try {
-      const res = await fetch("http://localhost:3000/api/task/service/all", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const data = await res.json();
+      const data = await taskService.getAllServices({ status: "active" });
       if (data.success) {
         setCategories(data.services || []);
       }
+      console.log("Loaded categories:", data.services);
     } catch (err) {
       console.error("Error loading categories:", err);
     }
@@ -54,13 +53,11 @@ const CustomerServiceList = () => {
   const loadTasks = async () => {
     setLoading(true);
     try {
-      const res = await fetch("http://localhost:3000/api/task/all", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const data = await res.json();
+      const data = await taskService.getAllTasks({ status: "active" });
       if (data.success) {
         setTasks(data.tasks || []);
       }
+      console.log("Loaded tasks:", data.tasks);
     } catch (err) {
       console.error("Error loading tasks:", err);
     } finally {
@@ -88,94 +85,85 @@ const CustomerServiceList = () => {
     setFilteredTasks(filtered);
   };
 
-  const handleTaskClick = (taskType, taskId, price) => {
+  const handleTaskClick = (taskType, taskId) => {
     const detailPage = TASK_DETAIL_MAP[taskType];
+    console.log("detailPage", detailPage);
     if (detailPage) {
-      navigate(`${detailPage}?id=${taskId}&price=${price}`);
+      navigate(`${detailPage}/${taskId}`);
     }
   };
 
   return (
-    <div className="min-h-screen bg-primary-100 flex flex-col">
-      <AppHeader
-        title="Danh sách dịch vụ"
-        showBack={true}
-        onBackClick={() => navigate(APP_PATHS.CUSTOMER.HOME)}
-      />
+    <div className="space-y-4">
+      {/* Search */}
+      <div className="sticky top-18 bg-primary-100 p-4 shadow-sm z-10">
+        <input
+          type="text"
+          placeholder="Tìm kiếm dịch vụ..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="w-full bg-white shadow-md px-4 py-3 rounded-full border focus:outline-none focus:border-primary-500"
+        />
+      </div>
 
-      <main className="flex-1 pb-24">
-        {/* Search */}
-        <div className="sticky top-18 bg-primary-100 p-4 shadow-sm z-10">
-          <input
-            type="text"
-            placeholder="Tìm kiếm dịch vụ..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full bg-white shadow-md px-4 py-3 rounded-full border focus:outline-none focus:border-primary-500"
-          />
-        </div>
-
-        {/* Category Filter */}
-        <div className="sticky top-36 bg-primary-100 p-4 pt-0 z-10">
-          <div className="flex gap-2 overflow-x-auto pb-2">
+      {/* Category Filter */}
+      <div className="sticky top-36 bg-primary-100 p-4 pt-0 z-10">
+        <div className="flex gap-2 overflow-x-auto pb-2">
+          <button
+            onClick={() => setSelectedCategory("all")}
+            className={cn(
+              "cursor-pointer px-4 py-2 rounded-full font-semibold whitespace-nowrap transition",
+              selectedCategory === "all"
+                ? "bg-primary-500 text-white shadow-md"
+                : "bg-white text-gray-600",
+            )}
+          >
+            Tất cả
+          </button>
+          {categories.map((category) => (
             <button
-              onClick={() => setSelectedCategory("all")}
-              className={`px-4 py-2 rounded-full font-semibold whitespace-nowrap transition ${
-                selectedCategory === "all"
+              key={category._id}
+              onClick={() => setSelectedCategory(category._id)}
+              className={cn(
+                "cursor-pointer px-4 py-2 rounded-full font-semibold whitespace-nowrap transition",
+                selectedCategory === category._id
                   ? "bg-primary-500 text-white shadow-md"
-                  : "bg-white text-gray-600"
-              }`}
+                  : "bg-white text-gray-600",
+              )}
             >
-              Tất cả
+              {category.category_name}
             </button>
-            {categories.map((category) => (
-              <button
-                key={category._id}
-                onClick={() => setSelectedCategory(category._id)}
-                className={`px-4 py-2 rounded-full font-semibold whitespace-nowrap transition ${
-                  selectedCategory === category._id
-                    ? "bg-primary-500 text-white shadow-md"
-                    : "bg-white text-gray-600"
-                }`}
-              >
-                {category.service_name}
-              </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Services Grid */}
+      <div className="p-4">
+        {loading ? (
+          <div className="text-center py-12">
+            <span className="material-symbols-outlined text-4xl text-primary-500 animate-spin">
+              progress_activity
+            </span>
+          </div>
+        ) : filteredTasks.length === 0 ? (
+          <div className="text-center py-12">
+            <span className="material-symbols-outlined text-6xl text-gray-300 mb-2">
+              search_off
+            </span>
+            <p className="text-gray-500">Không tìm thấy dịch vụ nào</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {filteredTasks.map((task) => (
+              <ServiceCard
+                key={task._id}
+                task={task}
+                onClick={() => handleTaskClick(task.task_type, task._id)}
+              />
             ))}
           </div>
-        </div>
-
-        {/* Services Grid */}
-        <div className="p-4">
-          {loading ? (
-            <div className="text-center py-12">
-              <span className="material-symbols-outlined text-4xl text-primary-500 animate-spin">
-                progress_activity
-              </span>
-            </div>
-          ) : filteredTasks.length === 0 ? (
-            <div className="text-center py-12">
-              <span className="material-symbols-outlined text-6xl text-gray-300 mb-2">
-                search_off
-              </span>
-              <p className="text-gray-500">Không tìm thấy dịch vụ nào</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {filteredTasks.map((task) => (
-                <ServiceCard
-                  key={task._id}
-                  task={task}
-                  onClick={() =>
-                    handleTaskClick(task.task_type, task._id, task.pricing)
-                  }
-                />
-              ))}
-            </div>
-          )}
-        </div>
-      </main>
-
-      <AppFooter />
+        )}
+      </div>
     </div>
   );
 };
@@ -187,10 +175,10 @@ const ServiceCard = ({ task, onClick }) => (
     className="bg-white rounded-xl shadow-md p-4 flex flex-col items-center text-center hover:shadow-lg hover:scale-105 transition-transform"
   >
     {/* Icon or Image */}
-    {task.image_url ? (
+    {task.avatar_url ? (
       <img
-        src={task.image_url}
-        alt={task.task_name}
+        src={task.avatar_url}
+        alt={task.category_name}
         className="w-full h-32 object-cover rounded-lg mb-3"
       />
     ) : (

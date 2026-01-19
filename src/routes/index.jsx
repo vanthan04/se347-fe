@@ -3,6 +3,11 @@ import App from "@/App";
 import ProtectedRoute from "@/components/protected/ProtectedRoute";
 import AdminProtectedRoute from "@/components/protected/AdminProtectedRoute";
 
+// Layouts
+import CustomerLayout from "@/components/layout/CustomerLayout";
+import TaskerLayout from "@/components/layout/TaskerLayout";
+import AdminLayout from "@/components/layout/AdminLayout";
+
 // Auth Pages
 import LoginSignup from "@/pages/auth/LoginSignup";
 import ForgotPassword from "@/pages/auth/ForgotPassword";
@@ -93,303 +98,196 @@ const router = createBrowserRouter([
           },
         ],
       },
-      // Customer Routes (Protected)
+      // Customer Routes (Protected) - với CustomerLayout
       {
         path: "customer",
+        element: (
+          <ProtectedRoute>
+            <CustomerLayout />
+          </ProtectedRoute>
+        ),
         children: [
           {
             path: "home",
-            element: (
-              <ProtectedRoute>
-                <CustomerHome />
-              </ProtectedRoute>
-            ),
+            element: <CustomerHome />,
           },
           {
             path: "profile",
-            element: (
-              <ProtectedRoute>
-                <CustomerProfile />
-              </ProtectedRoute>
-            ),
+            element: <CustomerProfile />,
           },
           {
             path: "activity",
-            element: (
-              <ProtectedRoute>
-                <CustomerActivity />
-              </ProtectedRoute>
-            ),
+            element: <CustomerActivity />,
           },
           {
             path: "services",
-            element: (
-              <ProtectedRoute>
-                <CustomerServiceList />
-              </ProtectedRoute>
-            ),
+            children: [
+              {
+                index: true,
+                element: <CustomerServiceList />,
+              },
+              // Service Detail Routes
+              {
+                path: "babysitting/:id",
+                element: <Babysitting />,
+              },
+              {
+                path: "cooking/:id",
+                element: <Cooking />,
+              },
+              {
+                path: "market/:id",
+                element: <Market />,
+              },
+              {
+                path: "cleaning-house/:id",
+                element: <CleaningHouse />,
+              },
+              {
+                path: "laundry/:id",
+                element: <Laundry />,
+              },
+              {
+                path: "take-care-of-elder/:id",
+                element: <TakeCareOfElder />,
+              },
+              {
+                path: "take-care-of-sick-people/:id",
+                element: <TakeCareOfSickPeople />,
+              },
+              {
+                path: "cleaning-air-conditioner/:id",
+                element: <CleaningAirConditioner />,
+              },
+              {
+                path: "cleaning-washing-machine/:id",
+                element: <CleaningWashingMachine />,
+              },
+            ],
           },
           {
             path: "book-now",
-            element: (
-              <ProtectedRoute>
-                <CustomerBookNow />
-              </ProtectedRoute>
-            ),
+            element: <CustomerBookNow />,
           },
           {
             path: "scheduled",
-            element: (
-              <ProtectedRoute>
-                <CustomerScheduled />
-              </ProtectedRoute>
-            ),
-          },
-          // Service Detail Routes
-          {
-            path: "details/babysitting",
-            element: (
-              <ProtectedRoute>
-                <Babysitting />
-              </ProtectedRoute>
-            ),
-          },
-          {
-            path: "details/cooking",
-            element: (
-              <ProtectedRoute>
-                <Cooking />
-              </ProtectedRoute>
-            ),
-          },
-          {
-            path: "details/market",
-            element: (
-              <ProtectedRoute>
-                <Market />
-              </ProtectedRoute>
-            ),
-          },
-          {
-            path: "details/cleaning-house",
-            element: (
-              <ProtectedRoute>
-                <CleaningHouse />
-              </ProtectedRoute>
-            ),
-          },
-          {
-            path: "details/laundry",
-            element: (
-              <ProtectedRoute>
-                <Laundry />
-              </ProtectedRoute>
-            ),
-          },
-          {
-            path: "details/take-care-of-elder",
-            element: (
-              <ProtectedRoute>
-                <TakeCareOfElder />
-              </ProtectedRoute>
-            ),
-          },
-          {
-            path: "details/take-care-of-sick-people",
-            element: (
-              <ProtectedRoute>
-                <TakeCareOfSickPeople />
-              </ProtectedRoute>
-            ),
-          },
-          {
-            path: "details/cleaning-air-conditioner",
-            element: (
-              <ProtectedRoute>
-                <CleaningAirConditioner />
-              </ProtectedRoute>
-            ),
-          },
-          {
-            path: "details/cleaning-washing-machine",
-            element: (
-              <ProtectedRoute>
-                <CleaningWashingMachine />
-              </ProtectedRoute>
-            ),
+            element: <CustomerScheduled />,
           },
           // Payment Routes
           {
             path: "payment",
-            element: (
-              <ProtectedRoute>
-                <Payment />
-              </ProtectedRoute>
-            ),
+            element: <Payment />,
           },
           {
             path: "payment/confirmation",
-            element: (
-              <ProtectedRoute>
-                <PaymentConfirmation />
-              </ProtectedRoute>
-            ),
+            element: <PaymentConfirmation />,
           },
           {
             path: "payment/voucher",
-            element: (
-              <ProtectedRoute>
-                <Voucher />
-              </ProtectedRoute>
-            ),
+            element: <Voucher />,
           },
           {
             path: "payment/success",
-            element: (
-              <ProtectedRoute>
-                <PaymentSuccess />
-              </ProtectedRoute>
-            ),
+            element: <PaymentSuccess />,
           },
           {
             path: "payment/cancel",
-            element: (
-              <ProtectedRoute>
-                <PaymentCancel />
-              </ProtectedRoute>
-            ),
+            element: <PaymentCancel />,
           },
           {
             path: "ordering/success",
-            element: (
-              <ProtectedRoute>
-                <OrderingSuccess />
-              </ProtectedRoute>
-            ),
+            element: <OrderingSuccess />,
           },
         ],
       },
-      // Tasker Routes (Protected)
+      // Tasker Routes (Protected) - với TaskerLayout
       {
         path: "tasker",
+        element: (
+          <ProtectedRoute>
+            <TaskerLayout />
+          </ProtectedRoute>
+        ),
         children: [
           {
             path: "home",
-            element: (
-              <ProtectedRoute>
-                <TaskerHome />
-              </ProtectedRoute>
-            ),
+            element: <TaskerHome />,
           },
           {
             path: "profile",
-            element: (
-              <ProtectedRoute>
-                <TaskerProfile />
-              </ProtectedRoute>
-            ),
+            element: <TaskerProfile />,
           },
           {
             path: "activity",
-            element: (
-              <ProtectedRoute>
-                <TaskerActivity />
-              </ProtectedRoute>
-            ),
-          },
-          {
-            path: "chat",
-            element: (
-              <ProtectedRoute>
-                <TaskerChat />
-              </ProtectedRoute>
-            ),
+            element: <TaskerActivity />,
           },
           {
             path: "orders/scheduled",
-            element: (
-              <ProtectedRoute>
-                <TaskerPreorder />
-              </ProtectedRoute>
-            ),
-          },
-          {
-            path: "order/:orderId",
-            element: (
-              <ProtectedRoute>
-                <TaskerOrderProgress />
-              </ProtectedRoute>
-            ),
-          },
-          {
-            path: "order/progress/:orderId",
-            element: (
-              <ProtectedRoute>
-                <TaskerOrderProgress />
-              </ProtectedRoute>
-            ),
+            element: <TaskerPreorder />,
           },
         ],
       },
-      // Admin Routes (Protected)
+      // Tasker Routes without Layout (full-screen pages)
+      {
+        path: "tasker/chat",
+        element: (
+          <ProtectedRoute>
+            <TaskerChat />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "tasker/order/:orderId",
+        element: (
+          <ProtectedRoute>
+            <TaskerOrderProgress />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "tasker/order/progress/:orderId",
+        element: (
+          <ProtectedRoute>
+            <TaskerOrderProgress />
+          </ProtectedRoute>
+        ),
+      },
+      // Admin Routes (Protected) - với AdminLayout
       {
         path: "admin",
+        element: (
+          <AdminProtectedRoute>
+            <AdminLayout />
+          </AdminProtectedRoute>
+        ),
         children: [
           {
             path: "home",
-            element: (
-              <AdminProtectedRoute>
-                <AdminHome />
-              </AdminProtectedRoute>
-            ),
+            element: <AdminHome />,
           },
           {
             path: "customers",
-            element: (
-              <AdminProtectedRoute>
-                <AdminManageCustomers />
-              </AdminProtectedRoute>
-            ),
+            element: <AdminManageCustomers />,
           },
           {
             path: "taskers",
-            element: (
-              <AdminProtectedRoute>
-                <AdminManageTaskers />
-              </AdminProtectedRoute>
-            ),
+            element: <AdminManageTaskers />,
           },
           {
             path: "services",
-            element: (
-              <AdminProtectedRoute>
-                <AdminManageServices />
-              </AdminProtectedRoute>
-            ),
+            element: <AdminManageServices />,
           },
           {
             path: "orders",
-            element: (
-              <AdminProtectedRoute>
-                <AdminManageOrders />
-              </AdminProtectedRoute>
-            ),
+            element: <AdminManageOrders />,
           },
           {
             path: "vouchers",
-            element: (
-              <AdminProtectedRoute>
-                <AdminManageVouchers />
-              </AdminProtectedRoute>
-            ),
+            element: <AdminManageVouchers />,
           },
           {
             path: "invoices",
-            element: (
-              <AdminProtectedRoute>
-                <AdminManageInvoices />
-              </AdminProtectedRoute>
-            ),
+            element: <AdminManageInvoices />,
           },
         ],
       },

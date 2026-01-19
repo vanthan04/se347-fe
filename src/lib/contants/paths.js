@@ -26,15 +26,15 @@ export const APP_PATHS = {
     
     // Service detail pages
     DETAILS: {
-      BABYSITTING: '/customer/babysitting',
-      COOKING: '/customer/cooking',
-      MARKET: '/customer/market',
-      CLEANING_HOUSE: '/customer/cleaning-house',
-      LAUNDRY: '/customer/laundry',
-      TAKE_CARE_OF_ELDER: '/customer/take-care-of-elder',
-      TAKE_CARE_OF_SICK_PEOPLE: '/customer/take-care-of-sick-people',
-      CLEANING_AIR_CONDITIONER: '/customer/cleaning-air-conditioner',
-      CLEANING_WASHING_MACHINE: '/customer/cleaning-washing-machine',
+      BABYSITTING: '/customer/services/babysitting',
+      COOKING: '/customer/services/cooking',
+      MARKET: '/customer/services/market',
+      CLEANING_HOUSE: '/customer/services/cleaning-house',
+      LAUNDRY: '/customer/services/laundry',
+      TAKE_CARE_OF_ELDER: '/customer/services/take-care-of-elder',
+      TAKE_CARE_OF_SICK_PEOPLE: '/customer/services/take-care-of-sick-people',
+      CLEANING_AIR_CONDITIONER: '/customer/services/cleaning-air-conditioner',
+      CLEANING_WASHING_MACHINE: '/customer/services/cleaning-washing-machine',
     },
 
     // Payment pages

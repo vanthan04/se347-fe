@@ -4,19 +4,22 @@
 export const categoryService = {
   // Get all categories
   getAllCategories: async () => {
-    const response = await api.get('/task/service/all');
+    const response = await api.get("/task/service/all");
     return response.data;
   },
 
   // Create category
   createCategory: async (categoryData) => {
-    const response = await api.post('/task/service/create', categoryData);
+    const response = await api.post("/task/service/create", categoryData);
     return response.data;
   },
 
   // Update category
   updateCategory: async (categoryId, categoryData) => {
-    const response = await api.patch(`/task/service/update/${categoryId}`, categoryData);
+    const response = await api.patch(
+      `/task/service/update/${categoryId}`,
+      categoryData,
+    );
     return response.data;
   },
 
@@ -31,13 +34,13 @@ export const categoryService = {
 export const taskService = {
   // Get all tasks
   getAllTasks: async () => {
-    const response = await api.get('/task/all');
+    const response = await api.get("/task/all");
     return response.data;
   },
 
   // Create task
   createTask: async (taskData) => {
-    const response = await api.post('/task/create', taskData);
+    const response = await api.post("/task/create", taskData);
     return response.data;
   },
 
@@ -58,13 +61,16 @@ export const taskService = {
 export const taskerManagementService = {
   // Get all taskers
   getAllTaskers: async () => {
-    const response = await api.get('/admin/taskers/all');
+    const response = await api.get("/admin/taskers/all");
     return response.data;
   },
 
   // Approve tasker
   approveTasker: async (taskerId, data) => {
-    const response = await api.patch(`/admin/taskers/approve/${taskerId}`, data);
+    const response = await api.patch(
+      `/admin/taskers/approve/${taskerId}`,
+      data,
+    );
     return response.data;
   },
 
@@ -85,7 +91,7 @@ export const taskerManagementService = {
 export const voucherManagementService = {
   // Get all vouchers
   getAllVouchers: async () => {
-    const response = await api.get('/discount/voucher/all');
+    const response = await api.get("/discount/voucher/all");
     return response.data;
   },
 
@@ -97,13 +103,16 @@ export const voucherManagementService = {
 
   // Create voucher
   createVoucher: async (voucherData) => {
-    const response = await api.post('/discount/voucher/create', voucherData);
+    const response = await api.post("/discount/voucher/create", voucherData);
     return response.data;
   },
 
   // Update voucher
   updateVoucher: async (voucherId, voucherData) => {
-    const response = await api.patch(`/discount/voucher/update/${voucherId}`, voucherData);
+    const response = await api.patch(
+      `/discount/voucher/update/${voucherId}`,
+      voucherData,
+    );
     return response.data;
   },
 
@@ -115,7 +124,9 @@ export const voucherManagementService = {
 
   // Get active services (for voucher creation)
   getActiveServices: async () => {
-    const response = await api.get('/task/service/all?status=active&task_status=active&limit=100');
+    const response = await api.get(
+      "/task/service/all?status=active&task_status=active&limit=100",
+    );
     return response.data;
   },
 };
@@ -124,13 +135,16 @@ export const voucherManagementService = {
 export const invoiceService = {
   // Get all invoices
   getAllInvoices: async () => {
-    const response = await api.get('/orders/receipt/all');
+    const response = await api.get("/orders/receipt/all");
     return response.data;
   },
 
   // Update invoice
   updateInvoice: async (invoiceId, data) => {
-    const response = await api.patch(`/orders/receipt/update/${invoiceId}`, data);
+    const response = await api.patch(
+      `/orders/receipt/update/${invoiceId}`,
+      data,
+    );
     return response.data;
   },
 
@@ -145,13 +159,16 @@ export const invoiceService = {
 export const customerManagementService = {
   // Get all customers
   getAllCustomers: async () => {
-    const response = await api.get('/admin/customers/all');
+    const response = await api.get("/admin/customers/all");
     return response.data;
   },
 
   // Update customer
   updateCustomer: async (customerId, data) => {
-    const response = await api.patch(`/admin/customers/update/${customerId}`, data);
+    const response = await api.patch(
+      `/admin/customers/update/${customerId}`,
+      data,
+    );
     return response.data;
   },
 };
@@ -160,7 +177,7 @@ export const customerManagementService = {
 export const orderManagementService = {
   // Get all orders
   getAllOrders: async () => {
-    const response = await api.get('/orders/all');
+    const response = await api.get("/orders/all");
     return response.data;
   },
 
@@ -175,19 +192,55 @@ export const orderManagementService = {
 export const adminStatsService = {
   // Get customer count
   getCustomerCount: async () => {
-    const response = await api.get('/admin/customers/count');
+    const response = await api.get("/admin/customers/count");
     return response.data;
   },
 
   // Get tasker count
   getTaskerCount: async () => {
-    const response = await api.get('/admin/taskers/count');
+    const response = await api.get("/admin/taskers/count");
     return response.data;
   },
 
   // Get order stats
   getOrderStats: async () => {
-    const response = await api.get('/admin/orders/stats');
+    const response = await api.get("/admin/orders/stats");
+    return response.data;
+  },
+};
+
+// Discount Management APIs
+export const discountService = {
+  // Get all discounts
+  getAllDiscounts: async () => {
+    const response = await api.get("/admin/discounts/all");
+    return response.data;
+  },
+
+  // Get discount by ID
+  getDiscountById: async (discountId) => {
+    const response = await api.get(`/admin/discounts/${discountId}`);
+    return response.data;
+  },
+
+  // Create discount
+  createDiscount: async (discountData) => {
+    const response = await api.post("/admin/discounts/create", discountData);
+    return response.data;
+  },
+
+  // Update discount
+  updateDiscount: async (discountId, discountData) => {
+    const response = await api.patch(
+      `/admin/discounts/update/${discountId}`,
+      discountData,
+    );
+    return response.data;
+  },
+
+  // Delete discount
+  deleteDiscount: async (discountId) => {
+    const response = await api.delete(`/admin/discounts/delete/${discountId}`);
     return response.data;
   },
 };
@@ -201,4 +254,5 @@ export default {
   customerManagementService,
   orderManagementService,
   adminStatsService,
+  discountService,
 };

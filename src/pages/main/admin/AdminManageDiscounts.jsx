@@ -3,8 +3,7 @@ import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { discountSchema } from "@/lib/schemas/adminSchemas";
-import useUserStore from "@/lib/stores/userStore";
-import { Link } from "react-router-dom";
+import { discountService } from "@/lib/services/adminService";
 
 const AdminManageDiscounts = () => {
   const [discounts, setDiscounts] = useState([]);
@@ -15,11 +14,7 @@ const AdminManageDiscounts = () => {
     editingId: null,
   });
   const [deleteModal, setDeleteModal] = useState({ open: false, id: null });
-  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [toast, setToast] = useState({ show: false, message: "" });
-
-  const { token } = useUserStore();
-  const API_BASE = "http://localhost:3000/api/admin/discounts";
 
   const form = useForm({
     resolver: zodResolver(discountSchema),
@@ -48,10 +43,7 @@ const AdminManageDiscounts = () => {
   const loadDiscounts = async () => {
     try {
       setLoading(true);
-      const res = await fetch(`${API_BASE}/all`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const data = await res.json();
+      const data = await discountService.getAllDiscounts();
       if (data.success) {
         setDiscounts(data.discounts || []);
       }
@@ -66,32 +58,16 @@ const AdminManageDiscounts = () => {
   const onSubmit = async (data) => {
     try {
       if (modal.mode === "add") {
-        const res = await fetch(`${API_BASE}/create`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(data),
-        });
-        const result = await res.json();
-        if (res.ok && result.success) {
+        const result = await discountService.createDiscount(data);
+        if (result.success) {
           showToast("Thêm khuyến mãi thành công!");
           await loadDiscounts();
           setModal({ open: false, mode: "add", editingId: null });
           form.reset();
         }
       } else {
-        const res = await fetch(`${API_BASE}/update/${modal.editingId}`, {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(data),
-        });
-        const result = await res.json();
-        if (res.ok && result.success) {
+        const result = await discountService.updateDiscount(modal.editingId, data);
+        if (result.success) {
           showToast("Cập nhật khuyến mãi thành công!");
           await loadDiscounts();
           setModal({ open: false, mode: "add", editingId: null });
@@ -108,12 +84,8 @@ const AdminManageDiscounts = () => {
     if (!deleteModal.id) return;
 
     try {
-      const res = await fetch(`${API_BASE}/delete/${deleteModal.id}`, {
-        method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const data = await res.json();
-      if (res.ok && data.success) {
+      const data = await discountService.deleteDiscount(deleteModal.id);
+      if (data.success) {
         showToast("Xóa khuyến mãi thành công!");
         await loadDiscounts();
       }
@@ -144,62 +116,24 @@ const AdminManageDiscounts = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {sidebarOpen && (
-        <div
-          className="fixed inset-0 z-40 bg-black/40 lg:hidden"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex justify-between items-center">
+        <h2 className="text-lg font-semibold text-gray-800">
+          Danh sách khuyến mãi
+        </h2>
+        <button
+          onClick={() => openModal("add")}
+          className="px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition flex items-center gap-2"
+        >
+          <span className="material-symbols-outlined">add</span>
+          Thêm khuyến mãi
+        </button>
+      </div>
 
-      <aside
-        className={`fixed inset-y-0 left-0 z-50 w-64 bg-gray-800 text-white transition-transform duration-200 lg:hidden ${sidebarOpen ? "" : "-translate-x-full"}`}
-      >
-        <SidebarContent />
-      </aside>
-
-      <div className="flex min-h-screen">
-        <aside className="w-64 bg-gray-800 text-white hidden lg:flex flex-col shrink-0">
-          <SidebarContent />
-        </aside>
-
-        <div className="flex-1 flex flex-col">
-          <header className="h-14 bg-white border-b border-gray-200 flex items-center justify-between px-5">
-            <button
-              onClick={() => setSidebarOpen(true)}
-              className="lg:hidden p-2 hover:bg-gray-100 rounded-lg"
-            >
-              <span className="material-symbols-outlined">menu</span>
-            </button>
-            <h1 className="text-xl font-bold text-gray-800">
-              Quản lý Khuyến mãi
-            </h1>
-            <div className="flex items-center gap-3">
-              <span className="material-symbols-outlined text-gray-600">
-                notifications
-              </span>
-              <div className="w-9 h-9 rounded-full bg-primary-500 flex items-center justify-center text-white font-semibold">
-                A
-              </div>
-            </div>
-          </header>
-
-          <div className="p-6 flex justify-between items-center">
-            <h2 className="text-lg font-semibold text-gray-800">
-              Danh sách khuyến mãi
-            </h2>
-            <button
-              onClick={() => openModal("add")}
-              className="px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition flex items-center gap-2"
-            >
-              <span className="material-symbols-outlined">add</span>
-              Thêm khuyến mãi
-            </button>
-          </div>
-
-          <div className="px-6 pb-6 flex-1">
-            <div className="bg-white rounded-lg shadow overflow-auto">
-              <table className="w-full">
+      {/* Table */}
+      <div className="bg-white rounded-lg shadow overflow-auto">
+        <table className="w-full">
                 <thead className="bg-gray-50">
                   <tr>
                     <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
@@ -313,8 +247,6 @@ const AdminManageDiscounts = () => {
               </table>
             </div>
           </div>
-        </div>
-      </div>
 
       {/* Form Modal */}
       {modal.open && (
@@ -497,45 +429,6 @@ const AdminManageDiscounts = () => {
     </div>
   );
 };
-
-const SidebarContent = () => (
-  <>
-    <div className="h-14 px-5 flex items-center gap-3 border-b border-white/10">
-      <div className="w-9 h-9 rounded-full bg-white flex items-center justify-center">
-        <span className="text-primary-500 font-bold text-xs">TG</span>
-      </div>
-      <div className="font-semibold text-sm">TaskGo Admin</div>
-    </div>
-    <nav className="p-3 flex-1 space-y-1">
-      <Link to="/admin" className="sidebar-link">
-        <span className="material-symbols-outlined">home</span>Trang chủ
-      </Link>
-      <Link to="/admin/customers" className="sidebar-link">
-        <span className="material-symbols-outlined">person</span>Quản lý
-        Customer
-      </Link>
-      <Link to="/admin/taskers" className="sidebar-link">
-        <span className="material-symbols-outlined">badge</span>Quản lý Tasker
-      </Link>
-      <Link to="/admin/services" className="sidebar-link">
-        <span className="material-symbols-outlined">design_services</span>Quản
-        lý Dịch vụ
-      </Link>
-      <Link to="/admin/orders" className="sidebar-link">
-        <span className="material-symbols-outlined">shopping_bag</span>Quản lý
-        Đơn hàng
-      </Link>
-      <Link to="/admin/discounts" className="sidebar-link active">
-        <span className="material-symbols-outlined">percent</span>Quản lý Khuyến
-        mãi
-      </Link>
-      <Link to="/admin/vouchers" className="sidebar-link">
-        <span className="material-symbols-outlined">local_activity</span>Quản lý
-        Voucher
-      </Link>
-    </nav>
-  </>
-);
 
 const Modal = ({ title, children, onClose }) => (
   <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">

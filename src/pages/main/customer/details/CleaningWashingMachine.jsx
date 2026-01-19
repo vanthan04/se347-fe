@@ -1,17 +1,16 @@
 ﻿/* eslint-disable react-hooks/exhaustive-deps */
 import { useState, useEffect } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { APP_PATHS } from "@/lib/contants";
 import { taskService } from "@/lib/services/customerService";
 
 const CleaningWashingMachine = () => {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
+  const { id: taskId } = useParams();
   const [devices, setDevices] = useState([]);
   const [taskDetail, setTaskDetail] = useState(null);
-  const basePrice = Number(searchParams.get("price")) || 500000;
-  const taskId = searchParams.get("id");
+  const basePrice = taskDetail?.pricing || 500000;
 
   const washingTypes = [
     { type: "top", icon: "view_agenda", label: "Máy giặt cửa trên" },
@@ -100,43 +99,32 @@ const CleaningWashingMachine = () => {
   };
 
   return (
-    <div className="bg-primary-100 min-h-screen font-montserrat">
-      <header className="bg-primary-200 py-4">
-        <div className="flex items-center justify-between px-4">
-          <div className="text-primary-500 w-10 h-10 rounded-full bg-white flex items-center justify-center opacity-70">
-            <img src="/images/taskgo-logo.png" alt="TaskGo" />
-          </div>
-          <h1 className="font-bold text-xl text-dark-900">Chi tiết dịch vụ</h1>
-          <div className="w-10 h-10 flex items-center justify-center">
-            <span className="material-symbols-outlined text-primary-500 text-4xl">
-              menu
-            </span>
-          </div>
-        </div>
-      </header>
+    <div className="bg-primary-100 min-h-screen pb-24">
+      {/* Banner */}
+      <div className="bg-gradient-to-r from-primary-500 to-primary-600 text-white p-6 shadow-lg">
+        <h1 className="text-2xl font-bold">Vệ sinh máy giặt</h1>
+        <p className="text-sm opacity-90 mt-1">
+          Dịch vụ vệ sinh và bảo dưỡng máy giặt
+        </p>
+      </div>
 
-      <main className="p-4 space-y-4 pb-20">
+      <main className="p-4 space-y-4">
         <div className="bg-white rounded-xl shadow-md p-4 space-y-4">
-          <div className="flex items-center justify-between border-b pb-2">
-            <h2 className="text-2xl font-bold text-primary-500">
-              Vệ sinh máy giặt
-            </h2>
+          <div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded">
+            <p className="text-sm text-gray-700">
+              <span className="font-semibold">📋 Quy trình 6 bước:</span>
+            </p>
+            <ul className="list-disc pl-5 space-y-1 text-sm text-gray-700 mt-2">
+              <li>Bước 1: Bật máy kiểm tra tình trạng hoạt động</li>
+              <li>Bước 2: Vệ sinh lưới lọc và van cấp nước</li>
+              <li>
+                Bước 3: Vệ sinh khay đựng nước giặt, xả; Vệ sinh lưới lọc xơ vải
+              </li>
+              <li>Bước 4: Vệ sinh lồng giặt</li>
+              <li>Bước 5: Lắp ráp các linh kiện sau khi đã vệ sinh, lau khô</li>
+              <li>Bước 6: Hoàn tất và kiểm tra lại</li>
+            </ul>
           </div>
-
-          <p className="text-base mb-4">
-            Đây là dịch vụ vệ sinh máy giặt với quy trình 6 bước:
-          </p>
-
-          <ul className="list-disc pl-5 space-y-2 text-sm text-dark-300 mb-6">
-            <li>Bước 1: Bật máy kiểm tra tình trạng hoạt động</li>
-            <li>Bước 2: Vệ sinh lưới lọc và van cấp nước</li>
-            <li>
-              Bước 3: Vệ sinh khay đựng nước giặt, xả; Vệ sinh lưới lọc xơ vải
-            </li>
-            <li>Bước 4: Vệ sinh lồng giặt</li>
-            <li>Bước 5: Lắp ráp các linh kiện sau khi đã vệ sinh, lau khô</li>
-            <li>Bước 6: Hoàn tất và kiểm tra lại</li>
-          </ul>
 
           <div className="space-y-4">
             <h3 className="font-bold text-dark-900 text-base">
@@ -251,31 +239,6 @@ const CleaningWashingMachine = () => {
           </div>
         </div>
       </main>
-
-      <footer>
-        <nav className="fixed bottom-0 left-0 right-0 bg-primary-200 border-t shadow-xl">
-          <div className="flex justify-around py-2 text-base">
-            <a href="#" className="flex flex-col items-center text-white">
-              <span className="material-symbols-outlined text-4xl">house</span>
-              Trang chủ
-            </a>
-            <a href="#" className="flex flex-col items-center text-primary-500">
-              <span className="material-symbols-outlined text-4xl">news</span>
-              Hoạt động
-            </a>
-            <a href="#" className="flex flex-col items-center text-primary-500">
-              <span className="material-symbols-outlined text-4xl">chat</span>
-              Tin nhắn
-            </a>
-            <a href="#" className="flex flex-col items-center text-primary-500">
-              <span className="material-symbols-outlined text-4xl">
-                lightbulb
-              </span>
-              Thông báo
-            </a>
-          </div>
-        </nav>
-      </footer>
     </div>
   );
 };

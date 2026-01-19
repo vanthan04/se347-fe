@@ -1,6 +1,6 @@
 ﻿import { useEffect, useState, useRef } from "react";
 import { useOrderStore } from "@/lib/stores/orderStore";
-import api from "@/lib/api/api";
+import useSocketStore from "@/lib/stores/socketStore";
 import { toast } from "react-toastify";
 
 const CustomTaskModal = () => {
@@ -31,18 +31,26 @@ const CustomTaskModal = () => {
 
   const handleAccept = async () => {
     try {
-      const res = await api.acceptTask(order._id);
-      if (res.success) {
-        // Cập nhật Store để nhảy sang mục "myWorkOrders"
-        updateOrder(res.data);
-        toast.success("🚀 Bạn đã nhận đơn thành công!");
-      }
+      // Emit socket event thay vì gọi API
+      const socket = useSocketStore.getState().socket;
+
+      socket.emit("tasker-accept", { order_id: order._id }, (response) => {
+        if (response.ok) {
+          updateOrder(response.order);
+          toast.success("🚀 Bạn đã nhận đơn thành công!");
+        } else {
+          if (response.error === "order_already_accepted") {
+            toast.error("Tiếc quá, có người nhanh tay hơn rồi!");
+          } else {
+            toast.error("Không thể nhận đơn");
+          }
+        }
+      });
     } catch (err) {
-      // Trường hợp người khác đã nhận hoặc lỗi server
-      toast.error("Tiếc quá, có người nhanh tay hơn rồi!");
+      toast.error("Có lỗi xảy ra!");
       console.error("Lỗi khi nhận đơn:", err);
     } finally {
-      setOrder(null); // Đóng modal
+      setOrder(null);
       if (timerRef.current) clearTimeout(timerRef.current);
     }
   };

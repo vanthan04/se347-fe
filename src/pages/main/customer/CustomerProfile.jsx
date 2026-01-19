@@ -9,8 +9,7 @@ import {
   profileUpdateSchema,
   addressSchema,
 } from "@/lib/schemas/customerSchemas";
-import AppHeader from "@/components/layout/AppHeader";
-import AppFooter from "@/components/layout/AppFooter";
+import { profileService } from "@/lib/services/customerService";
 
 const CustomerProfile = () => {
   const [profile, setProfile] = useState(null);
@@ -19,8 +18,9 @@ const CustomerProfile = () => {
   const [editingAddress, setEditingAddress] = useState(null);
   const [avatarPreview, setAvatarPreview] = useState(null);
   const [map, setMap] = useState(null);
+  const [, setMarker] = useState(null);
 
-  const { token, user, setUser } = useUserStore();
+  const { user, setUser, logout } = useUserStore();
   const navigate = useNavigate();
 
   const {
@@ -49,10 +49,7 @@ const CustomerProfile = () => {
 
   const loadProfile = async () => {
     try {
-      const res = await fetch("http://localhost:3000/api/customer/profile", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const data = await res.json();
+      const data = await profileService.getProfile();
       if (data.success) {
         setProfile(data.customer);
         setProfileValue("full_name", data.customer.full_name || "");
@@ -64,15 +61,13 @@ const CustomerProfile = () => {
       }
     } catch (err) {
       console.error("Error loading profile:", err);
+      toast.error("Không thể tải thông tin profile");
     }
   };
 
   const loadAddresses = async () => {
     try {
-      const res = await fetch("http://localhost:3000/api/customer/addresses", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const data = await res.json();
+      const data = await profileService.getAddresses();
       if (data.success) {
         setAddresses(data.addresses || []);
       }
@@ -83,16 +78,7 @@ const CustomerProfile = () => {
 
   const onSubmitProfile = async (data) => {
     try {
-      const res = await fetch("http://localhost:3000/api/customer/profile", {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(data),
-      });
-
-      const result = await res.json();
+      const result = await profileService.updateProfile(data);
       if (result.success) {
         toast.success("Cập nhật thông tin thành công!");
         setUser({ ...user, ...data });
@@ -110,17 +96,8 @@ const CustomerProfile = () => {
     const file = e.target.files[0];
     if (!file) return;
 
-    const formData = new FormData();
-    formData.append("avatar", file);
-
     try {
-      const res = await fetch("http://localhost:3000/api/customer/avatar", {
-        method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
-        body: formData,
-      });
-
-      const data = await res.json();
+      const data = await profileService.uploadAvatar(file);
       if (data.success) {
         setAvatarPreview(data.avatar_url);
         toast.success("Cập nhật ảnh đại diện thành công!");
@@ -209,22 +186,13 @@ const CustomerProfile = () => {
 
   const onSubmitAddress = async (data) => {
     try {
-      const url = editingAddress
-        ? `http://localhost:3000/api/customer/addresses/${editingAddress._id}`
-        : "http://localhost:3000/api/customer/addresses";
+      let result;
+      if (editingAddress) {
+        result = await profileService.updateAddress(editingAddress._id, data);
+      } else {
+        result = await profileService.addAddress(data);
+      }
 
-      const method = editingAddress ? "PATCH" : "POST";
-
-      const res = await fetch(url, {
-        method,
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(data),
-      });
-
-      const result = await res.json();
       if (result.success) {
         toast.success(
           editingAddress
@@ -246,15 +214,7 @@ const CustomerProfile = () => {
     if (!confirm("Bạn có chắc muốn xóa địa chỉ này?")) return;
 
     try {
-      const res = await fetch(
-        `http://localhost:3000/api/customer/addresses/${addressId}`,
-        {
-          method: "DELETE",
-          headers: { Authorization: `Bearer ${token}` },
-        },
-      );
-
-      const data = await res.json();
+      const data = await profileService.deleteAddress(addressId);
       if (data.success) {
         toast.success("Xóa địa chỉ thành công!");
         loadAddresses();
@@ -278,15 +238,14 @@ const CustomerProfile = () => {
 
   const handleLogout = () => {
     if (confirm("Bạn có chắc muốn đăng xuất?")) {
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
+      logout();
       navigate("/auth/login");
     }
   };
 
   if (!profile) {
     return (
-      <div className="min-h-screen bg-primary-100 flex items-center justify-center">
+      <div className="flex items-center justify-center py-20">
         <span className="material-symbols-outlined text-4xl text-primary-500 animate-spin">
           progress_activity
         </span>
@@ -295,185 +254,173 @@ const CustomerProfile = () => {
   }
 
   return (
-    <div className="min-h-screen bg-primary-100 flex flex-col">
-      <AppHeader
-        title="Hồ sơ"
-        showBack={true}
-        onBackClick={() => navigate("/customer")}
-      />
+    <div className="space-y-6">
+      {/* Avatar */}
+      <div className="text-center mb-6">
+        <div className="relative inline-block">
+          <img
+            src={avatarPreview || "/images/default-avatar.png"}
+            alt="Avatar"
+            className="w-24 h-24 rounded-full object-cover border-4 border-white shadow-md"
+          />
+          <label
+            htmlFor="avatar-upload"
+            className="absolute bottom-0 right-0 bg-primary-500 text-white p-2 rounded-full cursor-pointer hover:bg-primary-600 transition"
+          >
+            <span className="material-symbols-outlined text-sm">
+              photo_camera
+            </span>
+          </label>
+          <input
+            id="avatar-upload"
+            type="file"
+            accept="image/*"
+            onChange={handleAvatarChange}
+            className="hidden"
+          />
+        </div>
+        <h2 className="text-xl font-bold text-dark-900 mt-3">
+          {profile.full_name}
+        </h2>
+        <p className="text-gray-600">{profile.email}</p>
+      </div>
 
-      <main className="flex-1 p-4 pb-24">
-        {/* Avatar */}
-        <div className="text-center mb-6">
-          <div className="relative inline-block">
-            <img
-              src={avatarPreview || "/images/default-avatar.png"}
-              alt="Avatar"
-              className="w-24 h-24 rounded-full object-cover border-4 border-white shadow-md"
-            />
-            <label
-              htmlFor="avatar-upload"
-              className="absolute bottom-0 right-0 bg-primary-500 text-white p-2 rounded-full cursor-pointer hover:bg-primary-600 transition"
-            >
-              <span className="material-symbols-outlined text-sm">
-                photo_camera
-              </span>
+      {/* Profile Form */}
+      <form
+        onSubmit={handleSubmitProfile(onSubmitProfile)}
+        className="bg-white rounded-xl shadow-md p-4 mb-4"
+      >
+        <h3 className="font-semibold text-dark-900 mb-4">Thông tin cá nhân</h3>
+
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Họ và tên
             </label>
             <input
-              id="avatar-upload"
-              type="file"
-              accept="image/*"
-              onChange={handleAvatarChange}
-              className="hidden"
+              type="text"
+              {...registerProfile("full_name")}
+              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-primary-500"
+            />
+            {profileErrors.full_name && (
+              <p className="text-red-500 text-sm mt-1">
+                {profileErrors.full_name.message}
+              </p>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Số điện thoại
+            </label>
+            <input
+              type="tel"
+              {...registerProfile("phone")}
+              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-primary-500"
+            />
+            {profileErrors.phone && (
+              <p className="text-red-500 text-sm mt-1">
+                {profileErrors.phone.message}
+              </p>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              CCCD/CMND (tùy chọn)
+            </label>
+            <input
+              type="text"
+              {...registerProfile("cccd")}
+              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-primary-500"
             />
           </div>
-          <h2 className="text-xl font-bold text-dark-900 mt-3">
-            {profile.full_name}
-          </h2>
-          <p className="text-gray-600">{profile.email}</p>
-        </div>
 
-        {/* Profile Form */}
-        <form
-          onSubmit={handleSubmitProfile(onSubmitProfile)}
-          className="bg-white rounded-xl shadow-md p-4 mb-4"
-        >
-          <h3 className="font-semibold text-dark-900 mb-4">
-            Thông tin cá nhân
-          </h3>
-
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Họ và tên
-              </label>
-              <input
-                type="text"
-                {...registerProfile("full_name")}
-                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-primary-500"
-              />
-              {profileErrors.full_name && (
-                <p className="text-red-500 text-sm mt-1">
-                  {profileErrors.full_name.message}
-                </p>
-              )}
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Số điện thoại
-              </label>
-              <input
-                type="tel"
-                {...registerProfile("phone")}
-                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-primary-500"
-              />
-              {profileErrors.phone && (
-                <p className="text-red-500 text-sm mt-1">
-                  {profileErrors.phone.message}
-                </p>
-              )}
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                CCCD/CMND (tùy chọn)
-              </label>
-              <input
-                type="text"
-                {...registerProfile("cccd")}
-                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-primary-500"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Mã BIN ngân hàng (tùy chọn)
-              </label>
-              <input
-                type="text"
-                {...registerProfile("bin")}
-                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-primary-500"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Số tài khoản (tùy chọn)
-              </label>
-              <input
-                type="text"
-                {...registerProfile("account_number")}
-                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-primary-500"
-              />
-            </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Mã BIN ngân hàng (tùy chọn)
+            </label>
+            <input
+              type="text"
+              {...registerProfile("bin")}
+              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-primary-500"
+            />
           </div>
 
-          <button
-            type="submit"
-            className="w-full mt-4 py-3 bg-primary-500 text-white rounded-full font-semibold hover:bg-primary-600 transition"
-          >
-            Cập nhật thông tin
-          </button>
-        </form>
-
-        {/* Addresses */}
-        <div className="bg-white rounded-xl shadow-md p-4 mb-4">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="font-semibold text-dark-900">Địa chỉ của tôi</h3>
-            <button
-              onClick={() => openAddressModal()}
-              className="text-primary-500 font-semibold text-sm"
-            >
-              + Thêm mới
-            </button>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Số tài khoản (tùy chọn)
+            </label>
+            <input
+              type="text"
+              {...registerProfile("account_number")}
+              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-primary-500"
+            />
           </div>
-
-          {addresses.length === 0 ? (
-            <p className="text-gray-500 text-sm text-center py-4">
-              Chưa có địa chỉ nào
-            </p>
-          ) : (
-            <div className="space-y-3">
-              {addresses.map((address) => (
-                <div key={address._id} className="border rounded-lg p-3">
-                  <p className="font-medium text-dark-900">
-                    {address.full_address}
-                  </p>
-                  <p className="text-sm text-gray-600 mt-1">
-                    {address.street}, {address.ward}, {address.district},{" "}
-                    {address.city}
-                  </p>
-                  <div className="flex gap-2 mt-2">
-                    <button
-                      onClick={() => openAddressModal(address)}
-                      className="text-primary-500 text-sm font-semibold"
-                    >
-                      Sửa
-                    </button>
-                    <button
-                      onClick={() => deleteAddress(address._id)}
-                      className="text-red-500 text-sm font-semibold"
-                    >
-                      Xóa
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
         </div>
 
-        {/* Logout */}
         <button
-          onClick={handleLogout}
-          className="w-full py-3 bg-red-500 text-white rounded-full font-semibold hover:bg-red-600 transition"
+          type="submit"
+          className="w-full mt-4 py-3 bg-primary-500 text-white rounded-full font-semibold hover:bg-primary-600 transition"
         >
-          Đăng xuất
+          Cập nhật thông tin
         </button>
-      </main>
+      </form>
 
-      <AppFooter />
+      {/* Addresses */}
+      <div className="bg-white rounded-xl shadow-md p-4 mb-4">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="font-semibold text-dark-900">Địa chỉ của tôi</h3>
+          <button
+            onClick={() => openAddressModal()}
+            className="text-primary-500 font-semibold text-sm"
+          >
+            + Thêm mới
+          </button>
+        </div>
+
+        {addresses.length === 0 ? (
+          <p className="text-gray-500 text-sm text-center py-4">
+            Chưa có địa chỉ nào
+          </p>
+        ) : (
+          <div className="space-y-3">
+            {addresses.map((address) => (
+              <div key={address._id} className="border rounded-lg p-3">
+                <p className="font-medium text-dark-900">
+                  {address.full_address}
+                </p>
+                <p className="text-sm text-gray-600 mt-1">
+                  {address.street}, {address.ward}, {address.district},{" "}
+                  {address.city}
+                </p>
+                <div className="flex gap-2 mt-2">
+                  <button
+                    onClick={() => openAddressModal(address)}
+                    className="text-primary-500 text-sm font-semibold"
+                  >
+                    Sửa
+                  </button>
+                  <button
+                    onClick={() => deleteAddress(address._id)}
+                    className="text-red-500 text-sm font-semibold"
+                  >
+                    Xóa
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Logout */}
+      <button
+        onClick={handleLogout}
+        className="w-full py-3 bg-red-500 text-white rounded-full font-semibold hover:bg-red-600 transition"
+      >
+        Đăng xuất
+      </button>
 
       {/* Address Modal */}
       {showAddressModal && (

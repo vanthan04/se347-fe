@@ -1,13 +1,13 @@
 ﻿/* eslint-disable react-hooks/exhaustive-deps */
 import { useState, useEffect } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { APP_PATHS } from "@/lib/contants";
 import { taskService } from "@/lib/services/customerService";
 
 const CleaningHouse = () => {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
+  const { id: taskId } = useParams();
   const [houseType, setHouseType] = useState("");
   const [selectedTime, setSelectedTime] = useState({ hours: 0, price: 0 });
   const [extras, setExtras] = useState({
@@ -16,8 +16,7 @@ const CleaningHouse = () => {
     sofa: false,
   });
   const [taskDetail, setTaskDetail] = useState(null);
-  const basePrice = Number(searchParams.get("price")) || 180000;
-  const taskId = searchParams.get("id");
+  const basePrice = taskDetail?.pricing || 180000;
 
   const timeOptions = [
     { hours: 2, price: 180000, area: "≤ 50m² hoặc 2 phòng" },
@@ -129,41 +128,31 @@ const CleaningHouse = () => {
   };
 
   return (
-    <div className="bg-primary-100 min-h-screen font-montserrat">
-      <header className="bg-primary-200 py-4">
-        <div className="flex items-center justify-between px-4">
-          <div className="text-primary-500 w-10 h-10 rounded-full bg-white flex items-center justify-center opacity-70">
-            <img src="/images/taskgo-logo.png" alt="TaskGo" />
-          </div>
-          <h1 className="font-bold text-xl text-dark-900">Chi tiết dịch vụ</h1>
-          <div className="w-10 h-10 flex items-center justify-center">
-            <span className="material-symbols-outlined text-primary-500 text-4xl">
-              menu
-            </span>
-          </div>
-        </div>
-      </header>
+    <div className="bg-primary-100 min-h-screen pb-24">
+      {/* Banner */}
+      <div className="bg-gradient-to-r from-primary-500 to-primary-600 text-white p-6 shadow-lg">
+        <h1 className="text-2xl font-bold">Dọn dẹp nhà</h1>
+        <p className="text-sm opacity-90 mt-1">
+          Dịch vụ vệ sinh nhà cửa chuyên nghiệp
+        </p>
+      </div>
 
-      <main className="p-4 space-y-4 pb-20">
+      <main className="p-4 space-y-4">
         <div className="bg-white rounded-xl shadow-md p-4 space-y-4">
-          <div className="flex items-center justify-between border-b pb-2">
-            <h2 className="text-2xl font-bold text-primary-500">Dọn dẹp nhà</h2>
+          <div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded">
+            <p className="text-sm text-gray-700">
+              <span className="font-semibold">📋 Dịch vụ bao gồm:</span>
+            </p>
+            <ul className="list-disc pl-5 space-y-1 text-sm text-gray-700 mt-2">
+              <li>Quét, lau nhà, phòng ngủ, văn phòng, bếp</li>
+              <li>Lau kính, gương, đồ gỗ, đồ nhựa, sàn</li>
+              <li>Lau làm vệ sinh thiết bị điện tử, điện lạnh</li>
+              <li>Lau rửa vệ sinh phòng tắm, nhà vệ sinh</li>
+              <li>Chùi rửa bồn rửa bát, bồn cầu, bồn rửa mặt</li>
+              <li>Dọn dẹp bàn ghế, tủ, kệ, đồ trang trí, vật dụng</li>
+              <li>Đổ rác, lau chùi cầu thang</li>
+            </ul>
           </div>
-
-          <p className="text-base mb-4">
-            Đây là dịch vụ dọn dẹp nhà với các tuỳ chọn 2 giờ, 3 giờ, 4 giờ. Bao
-            gồm 1 hoặc nhiều các công việc:
-          </p>
-
-          <ul className="list-disc pl-5 space-y-2 text-sm text-dark-300 mb-6">
-            <li>Lau bụi và lau bề mặt</li>
-            <li>Sắp xếp giường cho gọn gàng</li>
-            <li>Hút bụi, lau sàn</li>
-            <li>Làm sạch toilet</li>
-            <li>Sắp xếp ngăn nắp các vật dụng</li>
-            <li>Rửa chén</li>
-            <li>Đổ rác</li>
-          </ul>
 
           <div className="space-y-3">
             <h3 className="font-semibold text-lg text-primary-500 flex items-center gap-2">
@@ -305,31 +294,6 @@ const CleaningHouse = () => {
           </div>
         </div>
       </main>
-
-      <footer>
-        <nav className="fixed bottom-0 left-0 right-0 bg-primary-200 border-t shadow-xl">
-          <div className="flex justify-around py-2 text-base">
-            <a href="#" className="flex flex-col items-center text-white">
-              <span className="material-symbols-outlined text-4xl">house</span>
-              Trang chủ
-            </a>
-            <a href="#" className="flex flex-col items-center text-primary-500">
-              <span className="material-symbols-outlined text-4xl">news</span>
-              Hoạt động
-            </a>
-            <a href="#" className="flex flex-col items-center text-primary-500">
-              <span className="material-symbols-outlined text-4xl">chat</span>
-              Tin nhắn
-            </a>
-            <a href="#" className="flex flex-col items-center text-primary-500">
-              <span className="material-symbols-outlined text-4xl">
-                lightbulb
-              </span>
-              Thông báo
-            </a>
-          </div>
-        </nav>
-      </footer>
     </div>
   );
 };

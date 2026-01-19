@@ -1,27 +1,54 @@
 ﻿/* eslint-disable react-hooks/exhaustive-deps */
 import { useState, useEffect } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { APP_PATHS } from "@/lib/contants";
 import { taskService } from "@/lib/services/customerService";
 
 const Babysitting = () => {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
+  const { id: taskId } = useParams();
   const [childCount, setChildCount] = useState(1);
   const [childAges, setChildAges] = useState([null, null]);
   const [totalTime, setTotalTime] = useState(0);
   const [taskDetail, setTaskDetail] = useState(null);
-  const basePrice = Number(searchParams.get("price")) || 100000;
-  const taskId = searchParams.get("id");
+  const basePrice = taskDetail?.pricing || 100000;
 
   useEffect(() => {
-    const confirmed = window.confirm(
-      "Dịch vụ này chỉ dành cho bé từ 12 tháng tuổi đến 11 tuổi. Xin quý khách lưu ý!",
-    );
-    if (!confirmed) {
-      navigate(-1);
-    }
+    const confirmToast = () =>
+      toast.warn(
+        <div>
+          <p className="mb-2 font-bold">
+            Dịch vụ này chỉ dành cho bé từ 12 tháng tuổi đến 11 tuổi. Xin quý
+            khách lưu ý!
+          </p>
+          <div className="flex gap-2 justify-end">
+            <button
+              onClick={() => toast.dismiss()}
+              className="text-gray-500 px-2"
+            >
+              Quay lại
+            </button>
+            <button
+              onClick={() => {
+                toast.dismiss();
+                fetchTaskDetail();
+              }}
+              className="bg-orange-500 text-white px-3 py-1 rounded"
+            >
+              Đồng ý
+            </button>
+          </div>
+        </div>,
+        {
+          position: "top-center",
+          autoClose: false,
+          closeOnClick: false,
+          closeButton: false,
+        },
+      );
+
+    confirmToast();
     fetchTaskDetail();
   }, []);
 
@@ -112,41 +139,32 @@ const Babysitting = () => {
   };
 
   return (
-    <div className="bg-primary-100 min-h-screen font-montserrat">
-      <header className="bg-primary-200 py-4">
-        <div className="flex items-center justify-between px-4">
-          <div className="text-primary-500 w-10 h-10 rounded-full bg-white flex items-center justify-center opacity-70">
-            <img src="/images/taskgo-logo.png" alt="TaskGo" />
-          </div>
-          <h1 className="font-bold text-xl text-dark-900">Chi tiết dịch vụ</h1>
-          <div className="w-10 h-10 flex items-center justify-center">
-            <span className="material-symbols-outlined text-primary-500 text-4xl">
-              menu
-            </span>
-          </div>
-        </div>
-      </header>
+    <div className="bg-primary-100 min-h-screen pb-24">
+      {/* Banner */}
+      <div className="bg-gradient-to-r from-primary-500 to-primary-600 text-white p-6 shadow-lg">
+        <h1 className="text-2xl font-bold">Trông trẻ</h1>
+        <p className="text-sm opacity-90 mt-1">
+          Dịch vụ chăm sóc trẻ em chuyên nghiệp
+        </p>
+      </div>
 
-      <main className="p-4 space-y-4 pb-20">
+      <main className="p-4 space-y-4">
         <div className="bg-white rounded-xl shadow-md p-4 space-y-4">
-          <div className="flex items-center justify-between border-b pb-2">
-            <h2 className="text-2xl font-bold text-primary-500">Trông trẻ</h2>
+          <div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded">
+            <p className="text-sm text-gray-700">
+              <span className="font-semibold">📋 Dịch vụ bao gồm:</span>
+            </p>
+            <ul className="list-disc pl-5 space-y-1 text-sm text-gray-700 mt-2">
+              <li>Đảm bảo sự an toàn cho trẻ trong suốt quá trình</li>
+              <li>
+                Hỗ trợ chuẩn bị và cho trẻ ăn theo yêu cầu và hướng dẫn của phụ
+                huynh
+              </li>
+              <li>Tổ chức các hoạt động học và vui chơi theo độ tuổi</li>
+              <li>Hướng dẫn và hỗ trợ vệ sinh cá nhân cho trẻ</li>
+              <li>Hỗ trợ đưa đón trẻ đi học cự ly đi bộ gần nhà</li>
+            </ul>
           </div>
-
-          <p className="text-base mb-4">
-            Đây là dịch vụ trông trẻ bao gồm 1 hoặc nhiều các công việc:
-          </p>
-
-          <ul className="list-disc pl-5 space-y-2 text-sm text-dark-300 mb-6">
-            <li>Đảm bảo sự an toàn cho trẻ trong suốt quá trình</li>
-            <li>
-              Hỗ trợ chuẩn bị và cho trẻ ăn theo yêu cầu và hướng dẫn của phụ
-              huynh
-            </li>
-            <li>Tổ chức các hoạt động học và vui chơi theo độ tuổi</li>
-            <li>Hướng dẫn và hỗ trợ vệ sinh cá nhân cho trẻ</li>
-            <li>Hỗ trợ đưa đón trẻ đi học cự ly đi bộ gần nhà</li>
-          </ul>
 
           <h3 className="text-lg font-bold text-dark-900">Chọn số lượng trẻ</h3>
           <div className="flex space-x-4">
@@ -241,31 +259,6 @@ const Babysitting = () => {
           </div>
         </div>
       </main>
-
-      <footer>
-        <nav className="fixed bottom-0 left-0 right-0 bg-primary-200 border-t shadow-xl">
-          <div className="flex justify-around py-2 text-base">
-            <a href="#" className="flex flex-col items-center text-white">
-              <span className="material-symbols-outlined text-4xl">house</span>
-              Trang chủ
-            </a>
-            <a href="#" className="flex flex-col items-center text-primary-500">
-              <span className="material-symbols-outlined text-4xl">news</span>
-              Hoạt động
-            </a>
-            <a href="#" className="flex flex-col items-center text-primary-500">
-              <span className="material-symbols-outlined text-4xl">chat</span>
-              Tin nhắn
-            </a>
-            <a href="#" className="flex flex-col items-center text-primary-500">
-              <span className="material-symbols-outlined text-4xl">
-                lightbulb
-              </span>
-              Thông báo
-            </a>
-          </div>
-        </nav>
-      </footer>
     </div>
   );
 };

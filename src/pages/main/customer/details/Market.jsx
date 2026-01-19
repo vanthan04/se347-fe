@@ -1,6 +1,6 @@
 ﻿/* eslint-disable react-hooks/exhaustive-deps */
 import { useState, useEffect } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { APP_PATHS } from "@/lib/contants";
 import { taskService } from "@/lib/services/customerService";
@@ -30,14 +30,13 @@ const MARKET_ITEMS = [
 
 const Market = () => {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
+  const { id: taskId } = useParams();
   const [selectedProducts, setSelectedProducts] = useState([]);
   const [productInput, setProductInput] = useState("");
   const [selectedQuick, setSelectedQuick] = useState("");
   const [estimatedAmount, setEstimatedAmount] = useState("");
   const [taskDetail, setTaskDetail] = useState(null);
-  const basePrice = Number(searchParams.get("price")) || 80000;
-  const taskId = searchParams.get("id");
+  const basePrice = taskDetail?.pricing || 80000;
 
   useEffect(() => {
     fetchTaskDetail();
@@ -153,40 +152,31 @@ const Market = () => {
   };
 
   return (
-    <div className="bg-primary-100 min-h-screen font-montserrat">
-      <header className="bg-primary-200 py-4">
-        <div className="flex items-center justify-between px-4">
-          <div className="text-primary-500 w-10 h-10 rounded-full bg-white flex items-center justify-center opacity-70">
-            <img src="/images/taskgo-logo.png" alt="TaskGo" />
-          </div>
-          <h1 className="font-bold text-xl text-dark-900">Chi tiết dịch vụ</h1>
-          <div className="w-10 h-10 flex items-center justify-center">
-            <span className="material-symbols-outlined text-primary-500 text-4xl">
-              menu
-            </span>
-          </div>
-        </div>
-      </header>
+    <div className="bg-gray-100 min-h-screen pb-24">
+      {/* Banner */}
+      <div className="bg-gradient-to-r from-primary-500 to-primary-600 text-white p-6 shadow-lg">
+        <h1 className="text-2xl font-bold">Đi chợ hộ</h1>
+        <p className="text-sm opacity-90 mt-1">
+          Dịch vụ mua sắm tạp hóa tiện lợi
+        </p>
+      </div>
 
-      <main className="p-4 space-y-4 pb-20">
+      <main className="p-4 space-y-4">
         <div className="bg-white rounded-xl shadow-md p-4 space-y-4">
-          <div className="flex items-center justify-between border-b pb-2">
-            <h2 className="text-2xl font-bold text-primary-500">Đi chợ</h2>
+          <div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded">
+            <p className="text-sm text-gray-700">
+              <span className="font-semibold">📋 Lưu ý:</span> Bạn có thể chọn
+              các sản phẩm từ danh sách có sẵn hoặc nhập sản phẩm nếu chưa có.
+              Sau đó chọn khối lượng của từng món mà bạn muốn tasker mua hộ nhé.
+            </p>
           </div>
-
-          <p className="text-base mb-4">
-            Đây là dịch vụ đi chợ hộ. Bạn có thể chọn các sản phẩm từ danh sách
-            có sẵn hoặc nhập sản phẩm nếu chưa có.
-            <br />
-            Sau đó chọn khối lượng của từng món mà bạn muốn tasker mua hộ nhé.
-          </p>
 
           <div>
             <div className="flex items-center space-x-2 bg-white p-3 border border-gray-300 rounded-lg">
               <select
                 value={selectedQuick}
                 onChange={(e) => setSelectedQuick(e.target.value)}
-                className="border-dashed bg-transparent flex-1 focus:outline-none"
+                className="border-dashed bg-transparent flex-1 focus:outline-none px-3"
               >
                 <option value="">-- Chọn nhanh sản phẩm --</option>
                 {MARKET_ITEMS.map((item, index) => (
@@ -304,31 +294,6 @@ const Market = () => {
           </div>
         </div>
       </main>
-
-      <footer>
-        <nav className="fixed bottom-0 left-0 right-0 bg-primary-200 border-t shadow-xl">
-          <div className="flex justify-around py-2 text-base">
-            <a href="#" className="flex flex-col items-center text-white">
-              <span className="material-symbols-outlined text-4xl">house</span>
-              Trang chủ
-            </a>
-            <a href="#" className="flex flex-col items-center text-primary-500">
-              <span className="material-symbols-outlined text-4xl">news</span>
-              Hoạt động
-            </a>
-            <a href="#" className="flex flex-col items-center text-primary-500">
-              <span className="material-symbols-outlined text-4xl">chat</span>
-              Tin nhắn
-            </a>
-            <a href="#" className="flex flex-col items-center text-primary-500">
-              <span className="material-symbols-outlined text-4xl">
-                lightbulb
-              </span>
-              Thông báo
-            </a>
-          </div>
-        </nav>
-      </footer>
     </div>
   );
 };

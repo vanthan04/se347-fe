@@ -162,22 +162,26 @@ const Voucher = () => {
   }
 
   return (
-    <div className="bg-primary-100 min-h-screen font-montserrat">
-      <header className="bg-primary-200 py-4">
-        <div className="flex items-center justify-between px-4">
-          <button onClick={() => navigate(-1)} className="text-primary-500">
+    <div className="bg-primary-100 min-h-screen pb-24">
+      {/* Banner */}
+      <div className="bg-gradient-to-r from-primary-500 to-primary-600 text-white p-6 shadow-lg">
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => navigate(-1)}
+            className="text-white hover:text-primary-100"
+          >
             <span className="material-symbols-outlined text-3xl">
               arrow_back
             </span>
           </button>
-
-          <h1 className="font-bold text-xl text-dark-900">Voucher</h1>
-
-          <div className="w-10"></div>
+          <div>
+            <h1 className="text-2xl font-bold">Voucher</h1>
+            <p className="text-sm opacity-90 mt-1">Chọn mã giảm giá của bạn</p>
+          </div>
         </div>
-      </header>
+      </div>
 
-      <main className="p-4 space-y-4 pb-32">
+      <main className="p-4 space-y-4">
         {/* Manual Code Input */}
         {!showManualInput ? (
           <button

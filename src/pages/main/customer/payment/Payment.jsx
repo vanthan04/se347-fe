@@ -263,23 +263,16 @@ const Payment = () => {
   }
 
   return (
-    <div className="bg-primary-100 min-h-screen font-montserrat">
-      <header className="bg-primary-200 py-4">
-        <div className="flex items-center justify-between px-4">
-          <div className="text-primary-500 w-10 h-10 rounded-full bg-white flex items-center justify-center opacity-70">
-            <img src="/images/taskgo-logo.png" alt="TaskGo" />
-          </div>
+    <div className="bg-primary-100 min-h-screen pb-24">
+      {/* Banner */}
+      <div className="bg-gradient-to-r from-primary-500 to-primary-600 text-white p-6 shadow-lg">
+        <h1 className="text-2xl font-bold">Dịch vụ của bạn</h1>
+        <p className="text-sm opacity-90 mt-1">
+          Kiểm tra thông tin dịch vụ và thanh toán
+        </p>
+      </div>
 
-          <h1 className="font-bold text-xl text-dark-900">Dịch vụ của bạn</h1>
-          <div className="w-10 h-10 flex items-center justify-center">
-            <span className="material-symbols-outlined text-primary-500 text-4xl">
-              menu
-            </span>
-          </div>
-        </div>
-      </header>
-
-      <main className="p-4 space-y-4 pb-32">
+      <main className="p-4 space-y-4">
         {/* Service Summary */}
         {renderServiceDetails()}
 

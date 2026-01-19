@@ -196,34 +196,34 @@ const TaskerOrderProgress = () => {
     });
   };
 
-  const getStatusBadgeClass = (status) => {
-    const statusMap = {
-      assigned: "bg-yellow-100 text-yellow-700",
-      accepted: "bg-green-100 text-green-700",
-      departed: "bg-purple-100 text-purple-700",
-      arrived: "bg-indigo-100 text-indigo-700",
-      in_progress: "bg-orange-100 text-orange-700",
-      completed: "bg-green-100 text-green-700",
-    };
-    return statusMap[status] || "bg-gray-100 text-gray-700";
-  };
+  // const getStatusBadgeClass = (status) => {
+  //   const statusMap = {
+  //     assigned: "bg-yellow-100 text-yellow-700",
+  //     accepted: "bg-green-100 text-green-700",
+  //     departed: "bg-purple-100 text-purple-700",
+  //     arrived: "bg-indigo-100 text-indigo-700",
+  //     in_progress: "bg-orange-100 text-orange-700",
+  //     completed: "bg-green-100 text-green-700",
+  //   };
+  //   return statusMap[status] || "bg-gray-100 text-gray-700";
+  // };
 
-  const getStatusText = (status) => {
-    const statusMap = {
-      assigned: "Đã được gán",
-      accepted: "Đã nhận đơn",
-      departed: "Đang di chuyển",
-      arrived: "Đã đến nơi",
-      in_progress: "Đang làm việc",
-      completed: "Hoàn thành",
-    };
-    return statusMap[status] || status;
-  };
+  // const getStatusText = (status) => {
+  //   const statusMap = {
+  //     assigned: "Đã được gán",
+  //     accepted: "Đã nhận đơn",
+  //     departed: "Đang di chuyển",
+  //     arrived: "Đã đến nơi",
+  //     in_progress: "Đang làm việc",
+  //     completed: "Hoàn thành",
+  //   };
+  //   return statusMap[status] || status;
+  // };
 
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#3730A3]"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primaryTasker-500"></div>
       </div>
     );
   }
@@ -238,73 +238,107 @@ const TaskerOrderProgress = () => {
 
   const actionButton = getActionButton();
 
+  const openChat = () => {
+    navigate(`/tasker/chat?orderId=${orderId}`);
+  };
+
   return (
-    <div className="min-h-screen bg-linear-to-br from-gray-50 to-gray-100 pb-8">
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        {/* Header */}
-        <div className="mb-6 flex items-center justify-between">
+    <div className="min-h-screen bg-gray-100 text-dark-900 flex flex-col">
+      {/* Header */}
+      <nav className="sticky top-0 z-100 bg-white shadow-sm">
+        <header className="bg-primary-200 flex items-center justify-between px-4 py-3 shadow-md">
           <div className="flex items-center gap-3">
             <button
-              onClick={() => navigate(APP_PATHS.TASKER.HOME)}
-              className="w-10 h-10 rounded-full bg-white shadow-sm border border-gray-200 flex items-center justify-center hover:bg-gray-50"
+              onClick={() => navigate("/tasker/home")}
+              className="shrink-0 w-9 h-9 bg-white rounded-full p-1 flex items-center justify-center shadow-sm hover:bg-gray-50 transition text-primary-700"
             >
-              <span className="material-symbols-outlined text-gray-600">
+              <span className="material-symbols-outlined text-[20px]">
                 arrow_back
               </span>
             </button>
-            <div>
-              <h2 className="text-xl font-bold text-gray-800">
-                Chi tiết đơn hàng
-              </h2>
-              <p className="text-sm text-gray-500">
-                #{order._id?.slice(-8).toUpperCase()}
-              </p>
-            </div>
+            <h1 className="text-dark-900 font-bold text-lg uppercase tracking-wide">
+              Chi tiết công việc
+            </h1>
           </div>
-          <span
-            className={`px-3 py-1 ${getStatusBadgeClass(order.status)} text-xs font-bold rounded-full uppercase`}
-          >
-            {getStatusText(order.status)}
-          </span>
-        </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <div className="flex items-center gap-2">
+            <a
+              href={`tel:${order.customer?.phone || ""}`}
+              className="w-9 h-9 flex items-center justify-center bg-white/20 rounded-full hover:bg-white/40 transition"
+            >
+              <span className="material-symbols-outlined text-dark-900">
+                call
+              </span>
+            </a>
+            <button
+              onClick={openChat}
+              className="w-9 h-9 flex items-center justify-center bg-white/20 rounded-full hover:bg-white/40 transition"
+            >
+              <span className="material-symbols-outlined text-dark-900">
+                chat
+              </span>
+            </button>
+          </div>
+        </header>
+      </nav>
+
+      <main className="flex-grow p-4 md:py-6 md:px-6">
+        <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
           {/* Left Column - Details */}
           <div className="lg:col-span-7 space-y-4">
             {/* Customer Info */}
             <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
-              <h3 className="font-bold text-gray-900 text-lg flex items-center mb-4">
-                <span className="material-symbols-outlined text-[#3730A3] mr-2">
-                  person
-                </span>
-                Thông tin khách hàng
-              </h3>
               <div className="flex items-center gap-4">
-                <img
-                  src={order.customer?.avatar_url || "/default-avatar.png"}
-                  alt="Customer"
-                  className="w-16 h-16 rounded-full object-cover"
-                />
-                <div>
-                  <p className="font-bold text-gray-900">
-                    {order.customer?.full_name || "Khách hàng"}
+                <div className="w-12 h-12 rounded-full bg-indigo-50 shrink-0 border border-indigo-100 p-0.5">
+                  <img
+                    src={order.customer?.avatar_url || "/default-avatar.png"}
+                    alt="Customer"
+                    className="w-full h-full object-cover rounded-full"
+                  />
+                </div>
+                <div className="flex-1">
+                  <p className="text-gray-400 text-[10px] font-bold uppercase mb-0.5">
+                    Khách hàng
                   </p>
-                  <p className="text-sm text-gray-500">
-                    {order.customer?.phone || "—"}
-                  </p>
-                  <p className="text-sm text-gray-500 flex items-center gap-1">
-                    <span className="text-yellow-500">★</span>
-                    {order.customer?.reputation_score || "—"}
-                  </p>
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <div>
+                      <p className="font-bold text-lg text-gray-800 leading-tight">
+                        {order.customer?.full_name || "Khách hàng"}
+                      </p>
+                      <p className="text-xs text-gray-500 font-medium">
+                        {order.customer?.phone || "—"}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={openChat}
+                        className="flex items-center gap-1.5 bg-blue-50 text-blue-700 px-3 py-2 rounded-full font-bold text-xs hover:bg-blue-100 transition shadow-sm active:scale-95 border border-blue-200"
+                      >
+                        <span className="material-symbols-outlined text-[18px]">
+                          chat
+                        </span>
+                        Nhắn tin
+                      </button>
+                      <a
+                        href={`tel:${order.customer?.phone || ""}`}
+                        className="flex items-center gap-1.5 bg-green-50 text-green-700 px-3 py-2 rounded-full font-bold text-xs hover:bg-green-100 transition shadow-sm active:scale-95 border border-green-200"
+                      >
+                        <span className="material-symbols-outlined text-[18px]">
+                          call
+                        </span>
+                        Gọi ngay
+                      </a>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
 
             {/* Service Details */}
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
-              <h3 className="font-bold text-gray-900 text-lg flex items-center mb-4">
-                <span className="material-symbols-outlined text-[#3730A3] mr-2">
-                  assignment
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 space-y-3">
+              <h3 className="font-bold text-dark-900 text-lg flex items-center">
+                <span className="material-symbols-outlined text-primary-500 mr-2">
+                  info
                 </span>
                 Chi tiết dịch vụ
               </h3>

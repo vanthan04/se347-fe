@@ -76,7 +76,7 @@ const PaymentConfirmation = () => {
   const loadAddresses = async () => {
     try {
       const response = await addressService.getMyAddresses();
-      if (response.success && response.data) {
+      if (response.total > 0 && response.data) {
         setAddresses(response.data);
 
         // Auto-select default address
@@ -277,23 +277,16 @@ const PaymentConfirmation = () => {
   }
 
   return (
-    <div className="bg-primary-100 min-h-screen font-montserrat">
-      <header className="bg-primary-200 py-4">
-        <div className="flex items-center justify-between px-4">
-          <div className="text-primary-500 w-10 h-10 rounded-full bg-white flex items-center justify-center opacity-70">
-            <img src="/images/taskgo-logo.png" alt="TaskGo" />
-          </div>
+    <div className="bg-primary-100 min-h-screen pb-24">
+      {/* Banner */}
+      <div className="bg-gradient-to-r from-primary-500 to-primary-600 text-white p-6 shadow-lg">
+        <h1 className="text-2xl font-bold">Xác nhận thanh toán</h1>
+        <p className="text-sm opacity-90 mt-1">
+          Thông tin địa chỉ và phương thức thanh toán
+        </p>
+      </div>
 
-          <h1 className="font-bold text-xl text-dark-900">Dịch vụ của bạn</h1>
-          <div className="w-10 h-10 flex items-center justify-center">
-            <span className="material-symbols-outlined text-primary-500 text-4xl">
-              menu
-            </span>
-          </div>
-        </div>
-      </header>
-
-      <main className="p-4 space-y-4 pb-32">
+      <main className="p-4 space-y-4">
         {/* Address Selection */}
         <div className="bg-white rounded-xl shadow-md p-4 space-y-2">
           <h3 className="font-bold text-dark-900">Địa chỉ làm việc</h3>

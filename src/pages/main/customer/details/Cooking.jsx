@@ -1,13 +1,13 @@
 ﻿/* eslint-disable react-hooks/exhaustive-deps */
 import { useState, useEffect } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { APP_PATHS } from "@/lib/contants";
 import { taskService } from "@/lib/services/customerService";
 
 const Cooking = () => {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
+  const { id: taskId } = useParams();
   const [numPeople, setNumPeople] = useState(2);
   const [numDishes, setNumDishes] = useState(2);
   const [flavor, setFlavor] = useState("Bắc");
@@ -15,8 +15,7 @@ const Cooking = () => {
   const [includeGrocery, setIncludeGrocery] = useState(false);
   const [dishList, setDishList] = useState("");
   const [taskDetail, setTaskDetail] = useState(null);
-  const basePrice = Number(searchParams.get("price")) || 100000;
-  const taskId = searchParams.get("id");
+  const basePrice = taskDetail?.pricing || 100000;
 
   useEffect(() => {
     fetchTaskDetail();
@@ -101,33 +100,22 @@ const Cooking = () => {
   };
 
   return (
-    <div className="bg-gray-100 min-h-screen font-montserrat">
-      <header className="bg-primary-200 py-4 sticky top-0 z-10 shadow-sm">
-        <div className="flex items-center justify-between px-4">
-          <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center opacity-70">
-            <img src="/images/taskgo-logo.png" alt="Logo" />
-          </div>
-          <h1 className="font-bold text-xl text-gray-800">Chi tiết dịch vụ</h1>
-          <div className="w-10 h-10 flex items-center justify-center">
-            <span className="material-symbols-outlined text-primary-500 text-4xl">
-              menu
-            </span>
-          </div>
-        </div>
-      </header>
+    <div className="bg-gray-100 min-h-screen pb-24">
+      {/* Banner */}
+      <div className="bg-gradient-to-r from-primary-500 to-primary-600 text-white p-6 shadow-lg">
+        <h1 className="text-2xl font-bold">Nấu ăn gia đình</h1>
+        <p className="text-sm opacity-90 mt-1">
+          Dịch vụ nấu ăn chuẩn vị 3 miền
+        </p>
+      </div>
 
-      <main className="p-4 space-y-4 pb-28">
+      <main className="p-4 space-y-4">
         <div className="bg-white rounded-xl shadow-md p-4 space-y-6">
-          <div className="border-b pb-2">
-            <h2 className="text-2xl font-bold text-primary-600">
-              Nấu ăn gia đình
-            </h2>
-            <p className="text-sm text-gray-500 mt-1">
-              Dịch vụ nấu ăn cho gia đình từ 2-8 người, chuẩn vị 3 miền.
-            </p>
-            <p className="text-sm text-gray-500 mt-1">
-              Nguyên liệu nấu ăn do khách hàng chuẩn bị (hoặc trả tiền cho
-              tasker đi chợ).
+          <div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded">
+            <p className="text-sm text-gray-700">
+              <span className="font-semibold">📋 Lưu ý:</span> Dịch vụ nấu ăn
+              cho gia đình từ 2-8 người, chuẩn vị 3 miền. Nguyên liệu nấu ăn do
+              khách hàng chuẩn bị (hoặc trả tiền cho tasker đi chợ).
             </p>
           </div>
 
@@ -147,7 +135,7 @@ const Cooking = () => {
                 onClick={() => setNumPeople(Math.min(8, numPeople + 1))}
                 className="w-10 h-10 flex items-center justify-center border-2 border-primary-500 text-primary-500 rounded-full font-bold text-2xl hover:bg-primary-50"
               >
-                &plus;
+                +
               </button>
             </div>
           </section>
@@ -286,31 +274,6 @@ const Cooking = () => {
           </div>
         </div>
       </main>
-
-      <footer>
-        <nav className="fixed bottom-0 left-0 right-0 bg-primary-200 border-t shadow-xl">
-          <div className="flex justify-around py-2 text-base">
-            <a href="#" className="flex flex-col items-center text-white">
-              <span className="material-symbols-outlined text-4xl">house</span>
-              Trang chủ
-            </a>
-            <a href="#" className="flex flex-col items-center text-primary-500">
-              <span className="material-symbols-outlined text-4xl">news</span>
-              Hoạt động
-            </a>
-            <a href="#" className="flex flex-col items-center text-primary-500">
-              <span className="material-symbols-outlined text-4xl">chat</span>
-              Tin nhắn
-            </a>
-            <a href="#" className="flex flex-col items-center text-primary-500">
-              <span className="material-symbols-outlined text-4xl">
-                lightbulb
-              </span>
-              Thông báo
-            </a>
-          </div>
-        </nav>
-      </footer>
     </div>
   );
 };

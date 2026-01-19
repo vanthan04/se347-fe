@@ -28,16 +28,16 @@ const PaymentCancel = () => {
   };
 
   return (
-    <div className="min-h-screen bg-primary-100 font-montserrat">
-      <header className="bg-primary-200 py-4">
-        <div className="flex items-center justify-center px-4">
-          <h1 className="font-bold text-xl text-dark-900">
-            Thanh toán không thành công
-          </h1>
-        </div>
-      </header>
+    <div className="min-h-screen bg-primary-100 pb-24">
+      {/* Banner */}
+      <div className="bg-gradient-to-r from-yellow-500 to-yellow-600 text-white p-6 shadow-lg">
+        <h1 className="text-2xl font-bold">Thanh toán không thành công</h1>
+        <p className="text-sm opacity-90 mt-1">
+          Vui lòng thử lại hoặc chọn phương thức khác
+        </p>
+      </div>
 
-      <main className="p-4 pb-32">
+      <main className="p-4">
         <div className="max-w-md mx-auto space-y-4 mt-8">
           {/* Error Icon */}
           <div className="bg-white rounded-xl shadow-md p-8 text-center">
